@@ -1,0 +1,292 @@
+%% ER Diagram for tiko_connect_brainiac
+erDiagram
+		account {
+			account_id text "UK, NOT NULL"
+			name text
+			parent_account_id text
+			location text
+			address text
+			record_type text
+			sub_type uuid
+			show_location_to_rafiki boolean
+			latitude double precision
+			longitude double precision
+			opening_hours text
+			capacity integer
+			status text
+			stage text
+			correlation_id text
+			account_uuid uuid PK "NOT NULL"
+			created_date timestamptz
+			type text
+			phone text
+			email text
+			payment_method text
+			mobile_money_number text
+			bank_account_holder_name text
+			bank_account_number text
+			bank_address text
+			bank_branch_name text
+			bank_code text
+			bank_name text
+			branch_code text
+			account_number text
+			account_primary_contact text
+			last_modified_at jsonb
+			contacts text
+			sector text
+			replay_id jsonb "NOT NULL, DEFAULT '{}'::jsonb"
+			intervention_tiko_ids text
+    }
+
+		coc_connector_version {
+			coc_connector_version_uuid uuid PK "NOT NULL"
+			connector_uuid uuid "NOT NULL"
+			document_version_uuid uuid "NOT NULL"
+    }
+
+		coc_country {
+			country_uuid uuid PK "NOT NULL"
+			country_code varchar "UK"
+    }
+
+		coc_document_version {
+			document_version_uuid uuid PK "NOT NULL"
+			version_number integer "UK"
+			uploaded_by varchar
+			enabled boolean
+			previous_version_uuid uuid
+			created_at timestamptz "NOT NULL, DEFAULT CURRENT_TIMESTAMP"
+    }
+
+		coc_document_version_translation {
+			document_version_translation_uuid uuid PK "NOT NULL"
+			language_uuid uuid
+			coc_document_version_uuid uuid
+			contents text "NOT NULL"
+    }
+
+		contact {
+			contact_id text "UK, NOT NULL"
+			account_uuid uuid
+			location text
+			gender text
+			mobile_phone text
+			other_phone text
+			correlation_id text
+			status text
+			stage text
+			record_type text
+			contact_uuid uuid PK "NOT NULL"
+			created_date timestamptz
+			telegram_contact text
+			facebook_contact text
+			birth_date date
+			email text
+			first_name text
+			last_name text
+			last_modified_at jsonb
+			replay_id jsonb "NOT NULL, DEFAULT '{}'::jsonb"
+			designation text
+    }
+
+		country_language {
+			country_language_uuid uuid PK "NOT NULL"
+			country_uuid uuid "UK, NOT NULL"
+			language_uuid uuid "UK, NOT NULL"
+			enabled boolean
+    }
+
+		flyway_schema_history {
+			installed_rank integer PK "NOT NULL"
+			version varchar
+			description varchar "NOT NULL"
+			type varchar "NOT NULL"
+			script varchar "NOT NULL"
+			checksum integer
+			installed_by varchar "NOT NULL"
+			installed_on timestamp "NOT NULL, DEFAULT now()"
+			execution_time integer "NOT NULL"
+			success boolean "NOT NULL"
+    }
+
+		intervention {
+			tiko_id uuid PK "NOT NULL"
+			identifier text "UK, NOT NULL"
+			description text
+			occurred_at timestamptz "NOT NULL"
+			version integer "NOT NULL, DEFAULT 0"
+    }
+
+		intervention_tiko_business {
+			intervention_tiko_id uuid
+			account_uuid uuid
+    }
+
+		job_execution_log {
+			job_execution_uuid uuid PK "NOT NULL, DEFAULT gen_random_uuid()"
+			name text
+			user_uuid uuid
+			status text
+			created_date timestamptz
+			correlation_id uuid
+    }
+
+		language {
+			language_uuid uuid PK "NOT NULL"
+			language_name varchar "UK"
+			language_code varchar
+    }
+
+		location {
+			location_id text PK "NOT NULL"
+			location_breadcrumb text
+			country text
+			location_uuid uuid
+    }
+
+		poi_conversation_context {
+			participant_id uuid PK "NOT NULL"
+			initial_trigger varchar "NOT NULL"
+			last_message_timestamp timestamptz "NOT NULL"
+			resolved_locations jsonb
+			chosen_location_index integer
+			state varchar "NOT NULL"
+			page_number integer
+			country_code varchar
+    }
+
+		poi_location {
+			id integer PK "NOT NULL"
+			requested_address text "NOT NULL"
+			updated_at timestamptz "NOT NULL"
+    }
+
+		poi_location_geocoded {
+			id text PK "NOT NULL"
+			formatted_address text "NOT NULL"
+			latitude double precision "NOT NULL"
+			longitude double precision "NOT NULL"
+			is_country boolean "NOT NULL, DEFAULT false"
+    }
+
+		poi_location_to_location_geocoded {
+			location_id integer PK "NOT NULL"
+			location_geocoded_id text PK "NOT NULL"
+    }
+
+		record_type {
+			record_type_id text PK "NOT NULL"
+			name text
+			salesforce_object_type text
+			record_type_uuid uuid
+    }
+
+		sqs_consumed_messages {
+			id bigint PK "NOT NULL"
+			message_id uuid "UK, NOT NULL"
+			consumed_at timestamptz "NOT NULL"
+    }
+
+		sub_type {
+			sub_type_uuid uuid PK "NOT NULL, DEFAULT gen_random_uuid()"
+			name text
+    }
+
+		tiko_business {
+			account_id text "UK"
+			name text
+			parent_account_id text
+			location text
+			address text
+			record_type text
+			sub_type uuid
+			show_location_to_rafiki boolean
+			latitude double precision
+			longitude double precision
+			opening_hours text
+			capacity integer
+			status text
+			stage text
+			correlation_id text
+			account_uuid uuid PK "NOT NULL"
+			created_date timestamptz
+			type text
+			phone text
+			email text
+			payment_method text
+			mobile_money_number text
+			bank_account_holder_name text
+			bank_account_number text
+			bank_address text
+			bank_branch_name text
+			bank_code text
+			bank_name text
+			branch_code text
+			account_number text
+			account_primary_contact text
+			tiko_connectors text
+			sector text
+			point geography
+    }
+
+		tiko_connector {
+			contact_id text "UK"
+			account_uuid uuid
+			location text
+			gender text
+			mobile_phone text
+			other_phone text
+			correlation_id text
+			status text
+			stage text
+			record_type text
+			contact_uuid uuid PK "NOT NULL"
+			created_date timestamptz
+			telegram_contact text
+			facebook_contact text
+			birth_date date
+			email text
+			first_name text
+			last_name text
+			designation text
+    }
+
+		tiko_location {
+			tiko_uuid uuid "UK"
+			salesforce_id text "UK"
+			location_name text
+			country_code text
+    }
+
+		tmp_account {
+			salesforce_id text
+			tiko_uuid text
+    }
+
+		tmp_contact {
+			salesforce_id text
+			tiko_uuid text
+    }
+
+		wizard {
+			id bigint PK "NOT NULL"
+			job_id text
+			object text
+			status text
+			crm_records_count bigint
+			persisted_records_count bigint
+			emitted_events_count bigint
+			created_date timestamptz
+			query text
+    }
+
+    coc_connector_version ||--o{ coc_document_version : "document_version_uuid → document_version_uuid (coc_connector_version_document_version_uuid_fkey)"
+    coc_connector_version ||--o{ tiko_connector : "connector_uuid → contact_uuid (coc_connector_version_connector_uuid_fkey)"
+    coc_document_version ||--|| coc_document_version : "Self-reference (coc_document_version_previous_version_uuid_fkey)"
+    coc_document_version_translation ||--o{ coc_document_version : "coc_document_version_uuid → document_version_uuid (coc_document_version_translation_coc_document_version_uuid_fkey)"
+    coc_document_version_translation ||--o{ language : "language_uuid → language_uuid (coc_document_version_translation_language_uuid_fkey)"
+    intervention_tiko_business ||--o{ intervention : "intervention_tiko_id → tiko_id (fk_intervention_tiko_business_intervention_tiko_id)"
+    intervention_tiko_business ||--o{ tiko_business : "account_uuid → account_uuid (fk_intervention_tiko_business_account_uuid)"
+    poi_location_to_location_geocoded ||--o{ poi_location : "location_id → id (poi_location_to_location_geocoded_location_id_fkey)"
+    poi_location_to_location_geocoded ||--o{ poi_location_geocoded : "location_geocoded_id → id (poi_location_to_location_geocoded_location_geocoded_id_fkey)"

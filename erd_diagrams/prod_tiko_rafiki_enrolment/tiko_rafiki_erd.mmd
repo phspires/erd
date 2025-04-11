@@ -1,0 +1,268 @@
+%% ER Diagram for tiko_rafiki
+erDiagram
+		answer_resource {
+			id uuid PK "NOT NULL"
+			conversation_answer_id uuid "NOT NULL"
+			language text
+			regex text
+			type text
+    }
+
+		attribute_new {
+			id uuid PK "NOT NULL"
+			attribute text "NOT NULL"
+			type text "NOT NULL"
+    }
+
+		connector {
+			connector_id uuid PK "NOT NULL"
+			status text
+			stage text
+			country text
+			created_date timestamp "NOT NULL"
+			location_id uuid
+			last_updated timestamp
+    }
+
+		connector_contact {
+			id bigint PK "NOT NULL, DEFAULT nextval('tiko_rafiki.connector_contact_id_seq'::regclass)"
+			contact text "NOT NULL"
+			connector_id uuid "NOT NULL"
+			created_at timestamp "NOT NULL"
+    }
+
+		contact {
+			id bigint PK "NOT NULL, DEFAULT nextval('tiko_rafiki.contact_id_seq'::regclass)"
+			contact text "UK, NOT NULL"
+			rafiki_id uuid "NOT NULL"
+			created_at timestamp "NOT NULL"
+    }
+
+		conversation {
+			id uuid PK "NOT NULL"
+			name text "NOT NULL"
+			type text "NOT NULL"
+			first_conversation_question uuid "NOT NULL"
+    }
+
+		conversation_answer {
+			id uuid PK "NOT NULL"
+			conversation_question_id uuid "NOT NULL"
+			next_conversation_question_id uuid
+    }
+
+		conversation_config {
+			id uuid PK "NOT NULL"
+			code_duration interval
+			code_number_times integer
+			type text "NOT NULL"
+			timeout interval
+    }
+
+		conversation_new {
+			id uuid PK "NOT NULL"
+			type text "NOT NULL"
+			question_ids uuid_array "NOT NULL, DEFAULT '{}'::uuid[]"
+    }
+
+		conversation_question {
+			id uuid PK "NOT NULL"
+			question_id uuid "NOT NULL"
+    }
+
+		conversation_status {
+			id bigint PK "NOT NULL, DEFAULT nextval('tiko_rafiki.conversation_status_id_seq'::regclass)"
+			rafiki_id uuid "UK"
+			question_id uuid
+			type text
+			version bigint "NOT NULL, DEFAULT nextval('tiko_rafiki.conversation_status_version_seq'::regclass)"
+			status text "NOT NULL, DEFAULT 'INACTIVE'::text"
+    }
+
+		flyway_schema_history {
+			installed_rank integer PK "NOT NULL"
+			version varchar
+			description varchar "NOT NULL"
+			type varchar "NOT NULL"
+			script varchar "NOT NULL"
+			checksum integer
+			installed_by varchar "NOT NULL"
+			installed_on timestamp "NOT NULL, DEFAULT now()"
+			execution_time integer "NOT NULL"
+			success boolean "NOT NULL"
+    }
+
+		kp_rafiki {
+			id bigint PK "NOT NULL, DEFAULT nextval('tiko_rafiki.kp_rafiki_id_seq'::regclass)"
+			rafiki_id uuid "UK, NOT NULL"
+			kp_type text "UK"
+			created_at timestamp "NOT NULL"
+    }
+
+		message {
+			id uuid PK "NOT NULL"
+			name text
+			type text
+    }
+
+		message_particle_new {
+			id uuid PK "NOT NULL"
+			particle text "NOT NULL"
+			language_code text "NOT NULL"
+			translation text "NOT NULL"
+    }
+
+		message_resource {
+			id uuid PK "NOT NULL"
+			message_id uuid "NOT NULL"
+			language text
+			text text "NOT NULL"
+    }
+
+		month_attribute_new {
+			id uuid PK "NOT NULL"
+			attribute_id uuid "NOT NULL"
+			calendar text "NOT NULL"
+			min_value integer "NOT NULL"
+			max_value integer "NOT NULL"
+			unknown_value integer
+    }
+
+		option_new {
+			id uuid PK "NOT NULL"
+			attribute_id uuid "NOT NULL"
+			option text "NOT NULL"
+    }
+
+		option_translation_new {
+			id uuid PK "NOT NULL"
+			option_id uuid "NOT NULL"
+			language_code text "NOT NULL"
+			user_input text "NOT NULL"
+			label text "NOT NULL"
+			created_at timestamp
+    }
+
+		peer_enrolment_configuration {
+			id bigint PK "NOT NULL, DEFAULT nextval('tiko_rafiki.peer_enrolment_configuration_id_seq'::regclass)"
+			amount_of_service_validations integer "NOT NULL"
+			last_service_validation integer "NOT NULL"
+    }
+
+		profile_merge {
+			source_id uuid PK "NOT NULL"
+			destination_id uuid "NOT NULL"
+			created_at timestamp "NOT NULL"
+    }
+
+		question {
+			id uuid PK "NOT NULL"
+			name text "NOT NULL"
+			attribute_name text
+			conversation_id uuid
+    }
+
+		question_new {
+			id uuid PK "NOT NULL"
+			attribute_id uuid "NOT NULL"
+    }
+
+		question_resource {
+			id uuid PK "NOT NULL"
+			question_id uuid "NOT NULL"
+			language text
+			text text "NOT NULL"
+			failed_message text
+    }
+
+		question_translation_new {
+			id uuid PK "NOT NULL"
+			question_id uuid "NOT NULL"
+			language_code text "NOT NULL"
+			translation text "NOT NULL"
+    }
+
+		rafiki {
+			id uuid PK "NOT NULL"
+			gender text
+			year_of_birth integer
+			month_of_birth integer
+			country text "NOT NULL"
+			enrolment_type text
+			contact_consent_agreed boolean
+			privacy_policy_agreed boolean
+			referral_id uuid
+			language text
+			created_at timestamp "NOT NULL"
+			date_of_birth date
+			offer_validated boolean
+			is_enrolled boolean
+			is_kp boolean "DEFAULT false"
+			last_service_validation timestamp
+			total_offer_validations integer "NOT NULL, DEFAULT 0"
+			location_id uuid
+			voice_required boolean "DEFAULT true"
+			is_voice_consent_given boolean "DEFAULT true"
+			voice_consent_last_updated timestamp
+			marketing_consent_agreed boolean
+    }
+
+		rafiki_delete_schedule {
+			id bigint PK "NOT NULL, DEFAULT nextval('tiko_rafiki.privacy_policy_rejected_schedule_id_seq'::regclass)"
+			rafiki_id uuid "NOT NULL"
+			created_at timestamp "NOT NULL"
+			delete_type text
+    }
+
+		single_choice_attribute_new {
+			id uuid PK "NOT NULL"
+    }
+
+		state {
+			id bigint PK "NOT NULL, DEFAULT nextval('tiko_rafiki.state_id_seq'::regclass)"
+			state text "NOT NULL"
+			rafiki_id uuid "NOT NULL"
+			reason text
+			created_at timestamp "NOT NULL"
+    }
+
+		trigger_configuration {
+			id uuid PK "NOT NULL"
+			trigger varchar "UK, NOT NULL"
+			type varchar "UK, NOT NULL"
+    }
+
+		trigger_country {
+			id bigint PK "NOT NULL, DEFAULT nextval('tiko_rafiki.trigger_country_id_seq'::regclass)"
+			country varchar "UK, NOT NULL"
+			trigger_configuration_id uuid "UK, NOT NULL"
+    }
+
+		year_attribute_new {
+			id uuid PK "NOT NULL"
+			attribute_id uuid "NOT NULL"
+			min_age integer
+			max_age integer
+    }
+
+    answer_resource ||--o{ conversation_answer : "conversation_answer_id → id (answer_resource_conversation_answer_id_fkey)"
+    connector_contact ||--o{ connector : "connector_id → connector_id (connector_contact_connector_id_fkey)"
+    contact ||--o{ rafiki : "rafiki_id → id (contact_rafiki_id_fkey)"
+    conversation ||--o{ conversation_question : "first_conversation_question → id (conversation_first_conversation_question_fkey)"
+    conversation_answer ||--o{ conversation_question : "next_conversation_question_id → id (conversation_answer_next_conversation_question_id_fkey)"
+    conversation_answer ||--o{ conversation_question : "conversation_question_id → id (conversation_answer_conversation_question_id_fkey)"
+    conversation_question ||--o{ question : "question_id → id (conversation_question_question_id_fkey)"
+    conversation_status ||--o{ rafiki : "rafiki_id → id (conversation_status_rafiki_id_fkey)"
+    kp_rafiki ||--o{ rafiki : "rafiki_id → id (kp_rafiki_rafiki_id_fkey)"
+    message_resource ||--o{ message : "message_id → id (message_resource_message_id_fkey)"
+    month_attribute_new ||--o{ attribute_new : "attribute_id → id (month_attribute_new_attribute_id_fkey)"
+    option_new ||--o{ attribute_new : "attribute_id → id (option_new_attribute_id_fkey)"
+    option_translation_new ||--o{ option_new : "option_id → id (option_translation_new_option_id_fkey)"
+    question ||--o{ conversation : "conversation_id → id (question_conversation_id_fkey)"
+    question_new ||--o{ attribute_new : "attribute_id → id (question_new_attribute_id_fkey)"
+    question_resource ||--o{ question : "question_id → id (question_resource_question_id_fkey)"
+    question_translation_new ||--o{ question_new : "question_id → id (question_translation_new_question_id_fkey)"
+    rafiki_delete_schedule ||--o{ rafiki : "rafiki_id → id (privacy_policy_rejected_schedule_rafiki_id_fkey)"
+    state ||--o{ rafiki : "rafiki_id → id (state_rafiki_id_fkey)"
+    trigger_country ||--o{ trigger_configuration : "trigger_configuration_id → id (trigger_country_trigger_configuration_id_fkey)"
+    year_attribute_new ||--o{ attribute_new : "attribute_id → id (year_attribute_new_attribute_id_fkey)"

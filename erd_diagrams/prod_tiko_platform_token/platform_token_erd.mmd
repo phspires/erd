@@ -1,0 +1,29 @@
+%% ER Diagram for platform_token
+erDiagram
+		flyway_schema_history {
+			installed_rank integer PK "NOT NULL"
+			version varchar
+			description varchar "NOT NULL"
+			type varchar "NOT NULL"
+			script varchar "NOT NULL"
+			checksum integer
+			installed_by varchar "NOT NULL"
+			installed_on timestamp "NOT NULL, DEFAULT now()"
+			execution_time integer "NOT NULL"
+			success boolean "NOT NULL"
+    }
+
+		token {
+			id bigint PK "NOT NULL, DEFAULT nextval('platform_token.token_id_seq'::regclass)"
+			participant_id uuid "NOT NULL"
+			token text "UK, NOT NULL"
+			attempts_remaining integer "NOT NULL"
+			expires_at timestamp
+			token_type text "NOT NULL"
+			create_date timestamp "DEFAULT CURRENT_TIMESTAMP"
+			version bigint "NOT NULL, DEFAULT nextval('platform_token.token_version_seq'::regclass)"
+			correlation_id text
+			purpose text
+			register_temp_trigger boolean "DEFAULT false"
+			coordinates varchar
+    }

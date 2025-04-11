@@ -1,0 +1,136 @@
+%% ER Diagram for tiko_rafiki_card
+erDiagram
+		attribute {
+			id uuid PK "NOT NULL"
+			attribute text "NOT NULL"
+			type text "NOT NULL"
+    }
+
+		card_auth_session_pin_details {
+			id bigint PK "NOT NULL, DEFAULT nextval('tiko_rafiki_card.card_auth_session_pin_details_id_seq'::regclass)"
+			session_id uuid "NOT NULL"
+			pin integer "NOT NULL"
+			pin_value text "NOT NULL"
+			created_at timestamp "NOT NULL"
+    }
+
+		card_auth_sessions {
+			id uuid PK "NOT NULL"
+			card_id text "NOT NULL"
+			state text "NOT NULL"
+			pin_validation_count integer
+			expires_at timestamp "NOT NULL"
+			created_at timestamp "NOT NULL"
+			properties text
+    }
+
+		card_batches {
+			id bigint PK "NOT NULL, DEFAULT nextval('tiko_rafiki_card.card_batches_id_seq'::regclass)"
+			description text
+			country text "NOT NULL"
+			file_name text
+			created_at timestamp "NOT NULL"
+			generated_by text
+			batch_id_printed boolean "DEFAULT false"
+    }
+
+		card_states {
+			id bigint PK "NOT NULL, DEFAULT nextval('tiko_rafiki_card.card_states_id_seq'::regclass)"
+			card_id bigint "NOT NULL"
+			state text "NOT NULL"
+			reason text
+			created_at timestamp "NOT NULL"
+			participant_id uuid
+			email text
+    }
+
+		cards {
+			id bigint PK "NOT NULL, DEFAULT nextval('tiko_rafiki_card.cards_id_seq'::regclass)"
+			identifier text "UK, NOT NULL"
+			pincode text "NOT NULL"
+			batch_id bigint
+			rafiki_id uuid
+			mvc_identifier text
+			state text
+    }
+
+		conversation {
+			id uuid PK "NOT NULL"
+			type text "NOT NULL"
+			question_ids uuid_array "NOT NULL, DEFAULT '{}'::uuid[]"
+    }
+
+		flyway_schema_history {
+			installed_rank integer PK "NOT NULL"
+			version varchar
+			description varchar "NOT NULL"
+			type varchar "NOT NULL"
+			script varchar "NOT NULL"
+			checksum integer
+			installed_by varchar "NOT NULL"
+			installed_on timestamp "NOT NULL, DEFAULT now()"
+			execution_time integer "NOT NULL"
+			success boolean "NOT NULL"
+    }
+
+		generating_batches {
+			id bigint PK "NOT NULL, DEFAULT nextval('tiko_rafiki_card.generating_batches_id_seq'::regclass)"
+			generating_status_id bigint "NOT NULL"
+			batch_id bigint "NOT NULL"
+			is_generated boolean "NOT NULL, DEFAULT false"
+			file_name text
+    }
+
+		generating_status {
+			id bigint PK "NOT NULL, DEFAULT nextval('tiko_rafiki_card.generating_status_id_seq'::regclass)"
+			country text
+			generating_cards integer
+			created_at timestamp "NOT NULL"
+			updated_at timestamp "NOT NULL"
+			estimated_finish_time timestamp "NOT NULL"
+			status text
+    }
+
+		message {
+			id uuid PK "NOT NULL"
+			name text "NOT NULL"
+			type text "NOT NULL"
+    }
+
+		message_resource {
+			id uuid PK "NOT NULL"
+			message_id uuid "NOT NULL"
+			language text
+			text text "NOT NULL"
+    }
+
+		option {
+			id uuid PK "NOT NULL"
+			attribute_id uuid "NOT NULL"
+			option text "NOT NULL"
+    }
+
+		question {
+			id uuid PK "NOT NULL"
+			attribute_id uuid "NOT NULL"
+    }
+
+		question_translation {
+			id uuid PK "NOT NULL"
+			question_id uuid "NOT NULL"
+			language_code text "NOT NULL"
+			translation text "NOT NULL"
+    }
+
+		single_choice_attribute {
+			id uuid PK "NOT NULL"
+    }
+
+    card_auth_session_pin_details ||--o{ card_auth_sessions : "session_id → id (fk_session_id)"
+    card_states ||--o{ cards : "card_id → id (fk_card_id)"
+    cards ||--o{ card_batches : "batch_id → id (fk_batch_id)"
+    generating_batches ||--o{ generating_status : "generating_status_id → id (fk_generating_status_id)"
+    message_resource ||--o{ message : "message_id → id (message_resource_message_id_fkey)"
+    option ||--o{ attribute : "attribute_id → id (option_attribute_id_fkey)"
+    question ||--o{ attribute : "attribute_id → id (question_attribute_id_fkey)"
+    question_translation ||--o{ question : "question_id → id (question_translation_question_id_fkey)"

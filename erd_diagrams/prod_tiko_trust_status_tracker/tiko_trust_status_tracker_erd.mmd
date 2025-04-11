@@ -1,0 +1,58 @@
+%% ER Diagram for tiko_trust_status_tracker
+erDiagram
+		flyway_schema_history {
+			installed_rank integer PK "NOT NULL"
+			version varchar
+			description varchar "NOT NULL"
+			type varchar "NOT NULL"
+			script varchar "NOT NULL"
+			checksum integer
+			installed_by varchar "NOT NULL"
+			installed_on timestamp "NOT NULL, DEFAULT now()"
+			execution_time integer "NOT NULL"
+			success boolean "NOT NULL"
+    }
+
+		sqs_consumed_messages {
+			id bigint PK "NOT NULL"
+			message_id varchar "UK, NOT NULL"
+			consumed_at timestamptz "NOT NULL"
+    }
+
+		tiko_connector {
+			connector_uuid text PK "NOT NULL"
+			country_code text
+			location_uuid text
+			connector_name text
+			mobile_phone text
+			other_phone text
+			tiko_business_uuid text
+			connector_kind text
+			country_name text
+			status text
+    }
+
+		trust_status {
+			uuid text PK "NOT NULL"
+			occurred_at timestamptz "NOT NULL"
+			validation_required boolean
+			status text "NOT NULL, DEFAULT 'OTHER'::text"
+			country_code text
+			kind text "NOT NULL"
+			note text
+			type text PK "NOT NULL"
+			requested_by text
+			notification_sent boolean
+			forced_logout boolean
+    }
+
+		trust_status_audit {
+			uuid text PK "NOT NULL"
+			occurred_at timestamptz PK "NOT NULL"
+			status text "NOT NULL"
+			note text
+			type text PK "NOT NULL"
+			requested_by text
+			notification_sent boolean
+			forced_logout boolean
+    }

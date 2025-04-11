@@ -1,0 +1,18 @@
+%% ER Diagram for mobile_inbox
+erDiagram
+		inbox_messages {
+			id bigint PK "NOT NULL, DEFAULT nextval('mobile_inbox.inbox_messages_id_seq'::regclass)"
+			idempotency_id text "UK, NOT NULL"
+			user_id uuid "NOT NULL"
+			title text "NOT NULL"
+			body text "NOT NULL"
+			category text "NOT NULL"
+			received_at timestamptz "NOT NULL"
+			status inbox_messages_status "NOT NULL"
+			icon_url text "NOT NULL"
+    }
+
+		sessions {
+			device_token text PK "NOT NULL"
+			user_id uuid "UK, NOT NULL"
+    }

@@ -1,0 +1,45 @@
+%% ER Diagram for cerebro
+erDiagram
+		countries {
+			id uuid PK "NOT NULL, DEFAULT gen_random_uuid()"
+			iso_code varchar "UK, NOT NULL, Description: Please use the ISO_3166-1 Alpha-2 codes defined he..."
+			long_name varchar "NOT NULL"
+			created_at timestamptz "NOT NULL, DEFAULT CURRENT_TIMESTAMP"
+			client_data jsonb
+    }
+
+		donor_projects {
+			id uuid PK "NOT NULL, DEFAULT gen_random_uuid()"
+			long_name varchar "NOT NULL"
+			created_at timestamptz "NOT NULL, DEFAULT CURRENT_TIMESTAMP"
+			updated_at timestamptz "NOT NULL, DEFAULT CURRENT_TIMESTAMP"
+			donor_id uuid "NOT NULL"
+			state project_state "NOT NULL, DEFAULT 'created'::cerebro.project_state"
+			start_date timestamptz "NOT NULL"
+			end_date timestamptz "NOT NULL"
+			country_id uuid "NOT NULL"
+    }
+
+		donors {
+			id uuid PK "NOT NULL, DEFAULT gen_random_uuid()"
+			short_name varchar "NOT NULL, Description: This column can only contain letters, numbers, - a..."
+			full_name varchar "NOT NULL, Description: This column has a minimum length of 1..."
+			created_at timestamptz "NOT NULL, DEFAULT CURRENT_TIMESTAMP"
+    }
+
+		locations {
+			id uuid PK "NOT NULL, DEFAULT gen_random_uuid()"
+			country_id uuid "NOT NULL"
+			full_name varchar "NOT NULL"
+			created_at timestamptz "NOT NULL, DEFAULT CURRENT_TIMESTAMP"
+			unique_name varchar "UK, NOT NULL"
+			path ltree "NOT NULL"
+			tree_level smallint "DEFAULT nlevel(path)"
+			parent_id uuid "UK"
+			updated_at timestamptz "NOT NULL"
+    }
+
+    donor_projects ||--o{ countries : "country_id → id (donor_projects_country_id_fkey)"
+    donor_projects ||--o{ donors : "donor_id → id (donor_projects_donor_id_fkey)"
+    locations ||--o{ countries : "country_id → id (locations_country_id_fkey)"
+    locations ||--|| locations : "Self-reference (locations_parent_id_fkey)"

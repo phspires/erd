@@ -1,0 +1,45 @@
+%% ER Diagram for mobile_authenticator
+erDiagram
+		opt_validation_attempts {
+			phone_number text
+			otp_secret bytea
+			occurred_at timestamptz "NOT NULL"
+    }
+
+		phone_numbers {
+			phone_number text PK "NOT NULL"
+			group_id uuid "UK"
+			user_id uuid
+			otp_secret bytea
+    }
+
+		refresh_tokens {
+			user_id uuid PK "NOT NULL"
+			refresh_token text PK "NOT NULL"
+			access_token text "NOT NULL"
+			expires_at timestamptz "NOT NULL"
+    }
+
+		revoked_tokens {
+			token text PK "NOT NULL"
+			expires_at timestamptz "NOT NULL"
+    }
+
+		session_tokens {
+			user_id uuid PK "NOT NULL"
+			access_token text PK "NOT NULL"
+			expires_at timestamptz "NOT NULL"
+    }
+
+		users {
+			id uuid PK "NOT NULL"
+			name text "NOT NULL"
+			group_id uuid
+			role user_role "NOT NULL"
+			status user_status "NOT NULL, DEFAULT 'Active'::mobile_authenticator.user_status"
+    }
+
+    opt_validation_attempts ||--o{ phone_numbers : "phone_number → phone_number (opt_validation_attempts_phone_number_fkey)"
+    phone_numbers ||--o{ users : "user_id → id (phone_numbers_user_id_fkey)"
+    refresh_tokens ||--o{ users : "user_id → id (refresh_tokens_user_id_fkey)"
+    session_tokens ||--o{ users : "user_id → id (session_tokens_user_id_fkey)"

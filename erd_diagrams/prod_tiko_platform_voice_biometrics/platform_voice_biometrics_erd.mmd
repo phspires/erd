@@ -1,0 +1,133 @@
+%% ER Diagram for platform_voice_biometrics
+erDiagram
+		backward_search {
+			id bigint PK "NOT NULL, DEFAULT nextval('platform_voice_biometrics.backward_search_id_seq'::regclass)"
+			voice_print_profile_id text "NOT NULL"
+			participant_id uuid "NOT NULL"
+			media_segment_id text "NOT NULL"
+			processed_audio_id text "NOT NULL"
+			completed boolean "NOT NULL, DEFAULT false"
+			create_date timestamp "DEFAULT CURRENT_TIMESTAMP"
+			new_voice_print_profile_id text
+			match_risk_value integer
+    }
+
+		connector {
+			id bigint PK "NOT NULL, DEFAULT nextval('platform_voice_biometrics.connector_id_seq'::regclass)"
+			connector_id uuid "NOT NULL"
+			location_id uuid "NOT NULL"
+			created_date timestamp "DEFAULT CURRENT_TIMESTAMP"
+    }
+
+		duplication_detection_match {
+			id bigint PK "NOT NULL, DEFAULT nextval('platform_voice_biometrics.duplication_detection_match_id_seq'::regclass)"
+			subject_rafiki_id uuid
+			matched_rafiki_id uuid
+			create_date timestamp "DEFAULT CURRENT_TIMESTAMP"
+			risk_value smallint
+			risk_reliability smallint
+			biometric_score real
+    }
+
+		duplication_detection_run {
+			id bigint PK "NOT NULL, DEFAULT nextval('platform_voice_biometrics.duplication_detection_run_id_seq'::regclass)"
+			create_date timestamp "DEFAULT CURRENT_TIMESTAMP"
+			duration_seconds integer "NOT NULL, DEFAULT nextval('platform_voice_biometrics.duplication_detection_run_duration_seconds_seq'::regclass)"
+			subject_rafiki_id uuid
+			biometric_threshold real
+			count_checked smallint
+			count_above_biometric_threshold smallint
+			count_verified_matches smallint
+			county_location uuid
+    }
+
+		flyway_schema_history {
+			installed_rank integer PK "NOT NULL"
+			version varchar
+			description varchar "NOT NULL"
+			type varchar "NOT NULL"
+			script varchar "NOT NULL"
+			checksum integer
+			installed_by varchar "NOT NULL"
+			installed_on timestamp "NOT NULL, DEFAULT now()"
+			execution_time integer "NOT NULL"
+			success boolean "NOT NULL"
+    }
+
+		location {
+			id uuid PK "NOT NULL"
+			name text "NOT NULL"
+			parent_id uuid
+			country text "NOT NULL"
+			created_date timestamp "DEFAULT CURRENT_TIMESTAMP"
+			level varchar
+    }
+
+		nuance_location {
+			id uuid PK "NOT NULL"
+    }
+
+		nuance_watchlist {
+			id bigint PK "NOT NULL, DEFAULT nextval('platform_voice_biometrics.nuance_watchlist_id_seq'::regclass)"
+			name text "UK, NOT NULL"
+			location_id uuid "NOT NULL"
+			type text "NOT NULL"
+			create_date timestamp "DEFAULT CURRENT_TIMESTAMP"
+			nuance_id uuid
+    }
+
+		rafiki_capture_metric {
+			id bigint PK "NOT NULL, DEFAULT nextval('platform_voice_biometrics.rafiki_capture_metric_id_seq'::regclass)"
+			participant_id uuid "NOT NULL"
+			succeeded boolean "NOT NULL, DEFAULT false"
+			action varchar
+			fail_type varchar
+			fail_count integer
+			created_at timestamptz "DEFAULT CURRENT_TIMESTAMP"
+    }
+
+		verified_voices {
+			id bigint PK "NOT NULL, DEFAULT nextval('platform_voice_biometrics.verified_voices_id_seq'::regclass)"
+			referral_id uuid "UK, NOT NULL"
+			participant_id uuid "UK, NOT NULL"
+			last_voice_verification timestamp "NOT NULL"
+    }
+
+		voice_match {
+			id bigint PK "NOT NULL, DEFAULT nextval('platform_voice_biometrics.voice_match_id_seq'::regclass)"
+			existing_participant_id uuid "NOT NULL"
+			new_participant_id uuid "NOT NULL"
+			watchlist_id bigint "NOT NULL, DEFAULT nextval('platform_voice_biometrics.voice_match_watchlist_id_seq'::regclass)"
+			country text "NOT NULL"
+			create_date timestamp "DEFAULT CURRENT_TIMESTAMP"
+			existing_participant_type text "NOT NULL"
+			new_participant_type text "NOT NULL"
+			risk_value smallint
+			risk_reliability smallint
+			biometric_score real
+    }
+
+		voice_print_profile {
+			id bigint PK "NOT NULL, DEFAULT nextval('platform_voice_biometrics.voice_print_profile_id_seq'::regclass)"
+			voice_print_profile_id uuid "NOT NULL"
+			participant_id uuid "UK, NOT NULL"
+			location_id uuid "NOT NULL"
+			media_segment_id text "NOT NULL"
+			processed_audio_id uuid "NOT NULL"
+			type text "NOT NULL"
+			create_date timestamp "DEFAULT CURRENT_TIMESTAMP"
+			referral_id uuid
+    }
+
+		voice_session {
+			id uuid PK "NOT NULL"
+			referrer_id uuid "NOT NULL"
+			participant_id uuid "NOT NULL"
+			expires_at timestamp "NOT NULL"
+			created_at timestamp "NOT NULL, DEFAULT CURRENT_TIMESTAMP"
+			session_type text "NOT NULL"
+			purpose text
+    }
+
+    location ||--|| location : "Self-reference (fk_parent_id)"
+    voice_match ||--o{ nuance_watchlist : "watchlist_id → id (voice_match_watchlist_id_fkey)"

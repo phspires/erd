@@ -1,0 +1,82 @@
+%% ER Diagram for trials
+erDiagram
+		connectors {
+			participant_id uuid PK "NOT NULL"
+			location_id uuid "NOT NULL"
+    }
+
+		locations_structure {
+			id uuid PK "NOT NULL"
+			name text "NOT NULL"
+			path ltree "NOT NULL"
+    }
+
+		offer_validated_history {
+			offer_validated_event_idempotency_id text PK "NOT NULL"
+			rafiki_id uuid "NOT NULL"
+			offer_id text "NOT NULL"
+			tiko_contact_id uuid
+			tiko_contact_business_id uuid
+			business_sub_type business_sub_type
+			country_code text "NOT NULL"
+			occurred_at timestamptz "NOT NULL"
+    }
+
+		participants {
+			id uuid PK "NOT NULL"
+			country_code text "NOT NULL"
+			birth_date date
+			gender gender
+			role participant_role "NOT NULL"
+			modified_at timestamptz "NOT NULL"
+			state participant_state "NOT NULL"
+    }
+
+		trial_group_participants {
+			participant_id uuid PK "NOT NULL"
+			group_id uuid PK "NOT NULL"
+			assigned_at timestamptz "NOT NULL"
+    }
+
+		trial_groups {
+			id uuid PK "NOT NULL"
+			trial_id uuid "NOT NULL"
+			name text "NOT NULL"
+    }
+
+		trial_results {
+			trial_id uuid "NOT NULL"
+			participant_id uuid "NOT NULL"
+			occurred_at timestamptz "NOT NULL"
+    }
+
+		trial_step_processed_by {
+			trial_step_id uuid PK "NOT NULL"
+			event_idempotency_id text PK "NOT NULL"
+    }
+
+		trial_steps {
+			id uuid PK "NOT NULL"
+			trial_id uuid "UK, NOT NULL"
+			step_trigger trial_step_trigger "UK, NOT NULL"
+			step_type trial_step_type "UK, NOT NULL"
+			selector jsonb "NOT NULL"
+    }
+
+		trials {
+			id uuid PK "NOT NULL"
+			name text "UK, NOT NULL"
+			country_code text "NOT NULL"
+			schedule trial_schedule_domain
+    }
+
+    connectors ||--o{ locations_structure : "location_id → id (connectors_location_id_fkey)"
+    connectors ||--o{ participants : "participant_id → id (connectors_participant_id_fkey)"
+    offer_validated_history ||--o{ participants : "rafiki_id → id (offer_validated_history_rafiki_id_fkey)"
+    trial_group_participants ||--o{ participants : "participant_id → id (trial_group_participants_participant_id_fkey)"
+    trial_group_participants ||--o{ trial_groups : "group_id → id (trial_group_participants_group_id_fkey)"
+    trial_groups ||--o{ trials : "trial_id → id (trial_groups_trial_id_fkey)"
+    trial_results ||--o{ participants : "participant_id → id (trial_results_participant_id_fkey)"
+    trial_results ||--o{ trials : "trial_id → id (trial_results_trial_id_fkey)"
+    trial_step_processed_by ||--o{ trial_steps : "trial_step_id → id (trial_step_processed_by_trial_step_id_fkey)"
+    trial_steps ||--o{ trials : "trial_id → id (trial_steps_trial_id_fkey)"

@@ -1,0 +1,101 @@
+%% ER Diagram for rekognition
+erDiagram
+		flyway_schema_history {
+			installed_rank integer PK "NOT NULL"
+			version varchar
+			description varchar "NOT NULL"
+			type varchar "NOT NULL"
+			script varchar "NOT NULL"
+			checksum integer
+			installed_by varchar "NOT NULL"
+			installed_on timestamp "NOT NULL, DEFAULT now()"
+			execution_time integer "NOT NULL"
+			success boolean "NOT NULL"
+    }
+
+		matched_face {
+			id integer PK "NOT NULL, DEFAULT nextval('rekognition.matched_face_id_seq'::regclass)"
+			user_id varchar "NOT NULL"
+			matched_faces_image_names text_array "NOT NULL"
+			image_name text
+			date_occurred timestamptz
+			function_type text
+			similarity text
+			face_detail jsonb
+			correlation_id text
+    }
+
+		rule_config {
+			id integer
+			country_code text
+			connector_role text_array
+    }
+
+		sign_in_attempt_log {
+			id integer PK "NOT NULL, DEFAULT nextval('rekognition.sign_in_attempt_log_id_seq'::regclass)"
+			user_id varchar
+			sign_in_attempts integer
+			date_occurred timestamptz
+			image_id varchar
+			correlation_id text
+			function_type text
+    }
+
+		sqs_consumed_messages {
+			id bigint PK "NOT NULL"
+			message_id varchar "UK, NOT NULL"
+			consumed_at timestamptz "NOT NULL"
+    }
+
+		suspicious_tracker {
+			id integer PK "NOT NULL, DEFAULT nextval('rekognition.suspicious_tracker_id_seq'::regclass)"
+			date_flagged timestamptz "NOT NULL"
+			face_id text "NOT NULL"
+			actor_name text "NOT NULL"
+			phone_number text "NOT NULL"
+			organisation text
+			summary text
+			task text
+			recommendations text
+    }
+
+		tmp_connect_connector {
+			contact_uuid text
+			first_name text
+			last_name text
+			mobile_phone text
+			country_code text
+			connector_role text
+    }
+
+		user_account_log {
+			id integer PK "NOT NULL, DEFAULT nextval('rekognition.user_account_log_id_seq'::regclass)"
+			user_uuid varchar "NOT NULL"
+			transaction_log_message varchar "NOT NULL"
+			transaction_type varchar "NOT NULL"
+			created_date timestamptz "NOT NULL"
+    }
+
+		users {
+			id integer PK "NOT NULL, DEFAULT nextval('rekognition.users_id_seq'::regclass)"
+			next_random_check date
+			sign_in_attempts integer "NOT NULL"
+			image_name text
+			user_id text "UK"
+			latest_image_name text
+			collection_face_id text
+			country_code text
+			user_name text
+			user_contact_details text
+			sign_up_date timestamptz
+			skip_facial_recognition boolean "DEFAULT false"
+			connector_role text
+			exclude_set_id integer
+    }
+
+		users_exclude_set {
+			id integer PK "NOT NULL, DEFAULT nextval('rekognition.users_exclude_set_id_seq'::regclass)"
+			reason text
+    }
+
+    users ||--o{ users_exclude_set : "exclude_set_id → id (users_exclude_set_id_fkey)"

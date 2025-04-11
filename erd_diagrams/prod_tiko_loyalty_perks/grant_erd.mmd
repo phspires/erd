@@ -1,0 +1,39 @@
+%% ER Diagram for grant
+erDiagram
+		perk_configuration_versions {
+			id integer PK "NOT NULL"
+			configuration_id uuid "NOT NULL"
+			identifier varchar "NOT NULL"
+			event varchar "NOT NULL"
+			country varchar "NOT NULL"
+			constraints jsonb "NOT NULL"
+			restrictions jsonb "NOT NULL"
+			active boolean "NOT NULL"
+			perk_details jsonb "NOT NULL"
+			created_by varchar "NOT NULL"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+    }
+
+		perk_configurations {
+			id uuid PK "NOT NULL, DEFAULT gen_random_uuid()"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+    }
+
+		perk_states {
+			id integer PK "NOT NULL"
+			perk_id uuid "NOT NULL"
+			state varchar "NOT NULL"
+			context jsonb "NOT NULL"
+			metadata jsonb "NOT NULL"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+    }
+
+		perks {
+			id uuid PK "NOT NULL, DEFAULT gen_random_uuid()"
+			recipient_id uuid "NOT NULL"
+			configuration_id uuid "NOT NULL"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+    }
+
+    perk_configuration_versions ||--o{ perk_configurations : "configuration_id → id (fk_versions_configuration_id)"
+    perk_states ||--o{ perks : "perk_id → id (fk_perks_states_perk_id)"

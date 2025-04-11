@@ -1,0 +1,25 @@
+%% ER Diagram for engine
+erDiagram
+		cashouts {
+			id uuid PK "NOT NULL, DEFAULT gen_random_uuid()"
+			payment_method varchar "NOT NULL"
+			market varchar "NOT NULL"
+			required_approvals varchar_array "NOT NULL"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+			target jsonb "NOT NULL, DEFAULT '{}'::jsonb"
+			amount bigint "NOT NULL"
+			request_identifier varchar "UK, NOT NULL"
+			configuration_id uuid
+			triggered_by varchar "NOT NULL"
+    }
+
+		cashouts_states {
+			id integer PK "NOT NULL, DEFAULT nextval('engine.cashouts_states_id_seq'::regclass)"
+			cashout_id uuid "NOT NULL"
+			state varchar "NOT NULL"
+			context jsonb "NOT NULL"
+			metadata jsonb "NOT NULL, DEFAULT '{}'::jsonb"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+    }
+
+    cashouts_states ||--o{ cashouts : "cashout_id → id (fk_cashout)"

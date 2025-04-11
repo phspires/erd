@@ -1,0 +1,53 @@
+%% ER Diagram for dry_ng
+erDiagram
+		accounts {
+			id uuid PK "NOT NULL, DEFAULT gen_random_uuid()"
+			kind varchar "NOT NULL"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+			modified_at timestamptz "NOT NULL, DEFAULT now()"
+    }
+
+		flyway_schema_history {
+			installed_rank integer PK "NOT NULL"
+			version varchar
+			description varchar "NOT NULL"
+			type varchar "NOT NULL"
+			script varchar "NOT NULL"
+			checksum integer
+			installed_by varchar "NOT NULL"
+			installed_on timestamp "NOT NULL, DEFAULT now()"
+			execution_time integer "NOT NULL"
+			success boolean "NOT NULL"
+    }
+
+		journal {
+			id bigint PK "NOT NULL"
+			amount bigint "NOT NULL"
+			operation varchar "NOT NULL"
+			origin uuid
+			origin_balance bigint
+			destination uuid
+			destination_balance bigint
+			request varchar "UK, NOT NULL"
+			reference integer "UK, NOT NULL, DEFAULT 1"
+			reverts bigint "UK"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+			metadata jsonb "NOT NULL, DEFAULT '{}'::jsonb"
+    }
+
+		owners {
+			id uuid PK "NOT NULL"
+			category varchar "UK, NOT NULL"
+			state varchar "NOT NULL"
+			main_account uuid "UK, NOT NULL"
+			hold_account uuid "UK, NOT NULL"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+			modified_at timestamptz "NOT NULL, DEFAULT now()"
+			data_timestamp timestamptz "NOT NULL"
+    }
+
+    journal ||--o{ accounts : "destination → id (journal_destination_fkey)"
+    journal ||--o{ accounts : "origin → id (journal_origin_fkey)"
+    journal ||--|| journal : "Self-reference (journal_reverts_fkey)"
+    owners ||--o{ accounts : "hold_account → id (owners_hold_account_fkey)"
+    owners ||--o{ accounts : "main_account → id (owners_main_account_fkey)"

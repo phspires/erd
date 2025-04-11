@@ -1,0 +1,13 @@
+%% ER Diagram for file_storer
+erDiagram
+		images {
+			id uuid PK "NOT NULL, DEFAULT gen_random_uuid()"
+			identifier text "UK, NOT NULL"
+			image_url text
+			created_at timestamptz "NOT NULL, DEFAULT CURRENT_TIMESTAMP"
+    }
+
+		templates {
+			id integer PK "NOT NULL, DEFAULT nextval('file_storer.templates_id_seq'::regclass)"
+			identifier text "UK, NOT NULL"
+    }

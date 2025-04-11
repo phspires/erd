@@ -1,0 +1,125 @@
+%% ER Diagram for tiko_connect_crm_bridge
+erDiagram
+		account {
+			account_uuid uuid PK "NOT NULL, DEFAULT gen_random_uuid()"
+			account_id text "UK"
+			name text
+			parent_account_id text
+			location uuid
+			address text
+			record_type uuid
+			sub_type uuid
+			show_location_to_rafiki boolean
+			latitude double precision
+			longitude double precision
+			opening_hours text
+			capacity integer
+			status text
+			stage text
+			account_primary_contact text
+			type text
+			correlation_id text
+			created_date timestamptz "DEFAULT now()"
+			email text
+			phone text
+			payment_method text
+			mobile_money_number text
+			bank_account_holder_name text
+			bank_account_number text
+			bank_address text
+			bank_branch_name text
+			bank_code text
+			bank_name text
+			branch_code text
+			account_number text
+			last_modified_at jsonb "DEFAULT '{}'::jsonb"
+    }
+
+		contact {
+			contact_uuid uuid PK "NOT NULL, DEFAULT gen_random_uuid()"
+			contact_id text "UK"
+			first_name text
+			last_name text
+			account_uuid uuid
+			record_type uuid
+			location uuid
+			gender text
+			mobile_phone text
+			other_phone text
+			birth_date date
+			correlation_id text
+			status text
+			stage text
+			created_date timestamptz "DEFAULT now()"
+			telegram_contact text
+			facebook_contact text
+			email text
+			last_modified_at jsonb "DEFAULT '{}'::jsonb"
+    }
+
+		crm_bulk_job_log {
+			job_id text PK "NOT NULL"
+			job_object_type text
+			job_operation text
+			job_state text
+			completed boolean
+			created_at timestamptz
+			updated_at timestamptz
+    }
+
+		flyway_schema_history {
+			installed_rank integer PK "NOT NULL"
+			version varchar
+			description varchar "NOT NULL"
+			type varchar "NOT NULL"
+			script varchar "NOT NULL"
+			checksum integer
+			installed_by varchar "NOT NULL"
+			installed_on timestamp "NOT NULL, DEFAULT now()"
+			execution_time integer "NOT NULL"
+			success boolean "NOT NULL"
+    }
+
+		intervention {
+			salesforce_id character PK "NOT NULL"
+			tiko_id uuid "UK, NOT NULL"
+			identifier text "UK, NOT NULL"
+			description text
+			occurred_at timestamptz "NOT NULL"
+			version integer "NOT NULL, DEFAULT 0"
+    }
+
+		record_type {
+			record_type_uuid uuid PK "NOT NULL, DEFAULT gen_random_uuid()"
+			record_type_id text "UK"
+			name text
+			salesforce_object_type text
+    }
+
+		sqs_consumed_messages {
+			id bigint PK "NOT NULL"
+			message_id varchar "UK, NOT NULL"
+			consumed_at timestamptz "NOT NULL"
+    }
+
+		sub_type {
+			sub_type_uuid uuid PK "NOT NULL, DEFAULT gen_random_uuid()"
+			name text
+    }
+
+		tiko_location {
+			location_uuid uuid PK "NOT NULL"
+			location_name text
+			parent_uuid uuid
+			version_uuid uuid
+			salesforce_id text
+			country text
+			salesforce_parent_id text
+    }
+
+    account ||--o{ record_type : "record_type → record_type_uuid (fk_record_type)"
+    account ||--o{ sub_type : "sub_type → sub_type_uuid (fk_sub_type)"
+    account ||--o{ tiko_location : "location → location_uuid (fk_location)"
+    contact ||--o{ account : "account_uuid → account_uuid (fk_account)"
+    contact ||--o{ record_type : "record_type → record_type_uuid (fk_record_type_contact)"
+    contact ||--o{ tiko_location : "location → location_uuid (fk_location_contact)"

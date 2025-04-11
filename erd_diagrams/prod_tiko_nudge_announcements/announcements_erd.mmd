@@ -1,0 +1,100 @@
+%% ER Diagram for announcements
+erDiagram
+		announcements_sent {
+			idempotency_id text PK "NOT NULL"
+			announcement_id uuid "UK, NOT NULL"
+			actor_id uuid "UK, NOT NULL"
+			business_type business_type
+			announcement_title text
+			actor_role actor_role "NOT NULL"
+			sector business_sector
+    }
+
+		business {
+			id uuid PK "NOT NULL"
+			business_type business_type "NOT NULL"
+			business_subtype business_subtype "NOT NULL"
+			modified_at timestamptz "NOT NULL"
+			sector business_sector
+    }
+
+		categories {
+			id uuid PK "NOT NULL"
+			category text "NOT NULL"
+			icon_url text "NOT NULL"
+    }
+
+		connector_business {
+			business_id uuid "NOT NULL"
+			connector_id uuid PK "NOT NULL"
+    }
+
+		connector_group_configs {
+			announcement_id uuid "UK, NOT NULL"
+			title text "NOT NULL"
+			countries text_array "NOT NULL"
+			connector_statuses connector_status_array "NOT NULL"
+			connector_types jsonb
+			category_id uuid "NOT NULL"
+			connector_business_sectors jsonb "NOT NULL"
+    }
+
+		connectors {
+			id uuid PK "NOT NULL"
+			name text "NOT NULL"
+			connector_type connector_type "NOT NULL"
+			country_code text "NOT NULL"
+			status connector_status "NOT NULL"
+			location_id uuid "NOT NULL"
+			modified_at timestamptz
+    }
+
+		locations_structure {
+			id uuid PK "NOT NULL"
+			name text "NOT NULL"
+			path ltree "NOT NULL"
+    }
+
+		rafiki_group_configs {
+			announcement_id uuid "UK, NOT NULL"
+			countries text_array "NOT NULL"
+			genders gender_array
+			age_range age_range
+    }
+
+		rafikis {
+			id uuid PK "NOT NULL"
+			country_code text "NOT NULL"
+			location_id uuid
+			date_of_birth date
+			gender gender
+			modified_at timestamptz "NOT NULL"
+			rafiki_state rafiki_state "NOT NULL"
+    }
+
+		scheduled_announcements {
+			id uuid PK "NOT NULL"
+			body text "NOT NULL"
+			created_at timestamptz "NOT NULL"
+			scheduled_for timestamptz "NOT NULL"
+			sent_at timestamptz
+			status announcement_status "NOT NULL"
+			time_zone text "NOT NULL, DEFAULT 'UTC'::text"
+			announcement_type announcement_type "NOT NULL"
+    }
+
+		scheduled_announcements_locations {
+			scheduled_announcement_id uuid PK "NOT NULL"
+			location_id uuid PK "NOT NULL"
+    }
+
+    announcements_sent ||--o{ scheduled_announcements : "announcement_id → id (announcements_sent_announcement_id_fkey)"
+    connector_business ||--o{ business : "business_id → id (connector_business_business_id_fkey)"
+    connector_business ||--o{ connectors : "connector_id → id (connector_business_connector_id_fkey)"
+    connector_group_configs ||--o{ categories : "category_id → id (connector_group_configs_category_id_fkey)"
+    connector_group_configs ||--o{ scheduled_announcements : "announcement_id → id (connector_group_configs_announcement_id_fkey)"
+    connectors ||--o{ locations_structure : "location_id → id (connectors_location_id_fkey)"
+    rafiki_group_configs ||--o{ scheduled_announcements : "announcement_id → id (rafiki_group_configs_announcement_id_fkey)"
+    rafikis ||--o{ locations_structure : "location_id → id (rafikis_location_id_fkey)"
+    scheduled_announcements_locations ||--o{ locations_structure : "location_id → id (scheduled_announcements_locations_location_id_fkey)"
+    scheduled_announcements_locations ||--o{ scheduled_announcements : "scheduled_announcement_id → id (scheduled_announcements_location_scheduled_announcement_id_fkey)"

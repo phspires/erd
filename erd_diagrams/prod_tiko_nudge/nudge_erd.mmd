@@ -1,0 +1,115 @@
+%% ER Diagram for nudge
+erDiagram
+		offer_validated_history {
+			rafiki_id text "NOT NULL"
+			offer_id text "NOT NULL"
+			offer_validated_event_idempotency_id text PK "NOT NULL"
+			tiko_contact_id text
+			occurred_at timestamptz
+    }
+
+		participant_groups {
+			participant_id text PK "NOT NULL"
+			participant_group text PK "NOT NULL"
+			created_at timestamptz "NOT NULL"
+    }
+
+		participant_status {
+			participant_id text PK "NOT NULL"
+			status participant_status_enum "NOT NULL"
+			modified_at timestamptz "NOT NULL"
+    }
+
+		participants {
+			id text PK "NOT NULL"
+			country text "NOT NULL"
+			year_of_birth integer
+			month_of_birth integer
+			gender text
+			modified_at timestamptz "NOT NULL"
+			organisation_id text
+			location text_array
+			role participant_role
+    }
+
+		rafiki_referrals {
+			rafiki_id text PK "NOT NULL"
+			referral_participant_id text "NOT NULL"
+			referral_event_id text
+    }
+
+		reminders {
+			id uuid PK "NOT NULL"
+			resource_key text "NOT NULL"
+			delay interval "NOT NULL"
+			modified_at timestamptz "NOT NULL"
+			created_at timestamptz "NOT NULL"
+			local_time time
+			time_zone text
+			recurrence integer "NOT NULL, DEFAULT 1"
+			is_active boolean "NOT NULL, DEFAULT true"
+			trigger_type reminder_trigger_type "NOT NULL, DEFAULT 'OfferValidated'::nudge.reminder_trigger_type"
+			trigger_criteria jsonb
+			cancellable_by jsonb "NOT NULL"
+			country_codes text_array "NOT NULL"
+    }
+
+		resources {
+			catalog varchar PK "NOT NULL"
+			name varchar PK "NOT NULL"
+			locale varchar PK "NOT NULL"
+			medium resource_medium PK "NOT NULL"
+			content_type varchar "NOT NULL"
+			body text "NOT NULL"
+			modified_at timestamptz "NOT NULL"
+    }
+
+		reward_history {
+			participant_id text PK "NOT NULL"
+			participant_reward_sequence_number integer PK "NOT NULL"
+			tiko_miles integer "NOT NULL"
+			donation_id text
+			correlation_context_id text "NOT NULL"
+			created_at timestamptz "NOT NULL"
+			offer_id text
+			idempotency_id text "UK, NOT NULL"
+			reward_for_role_id uuid
+			trial_reward_details trial_reward_details_domain "DEFAULT NULL::nudge.trial_reward_details"
+    }
+
+		subscriptions {
+			participant_id text PK "NOT NULL"
+			status subscription "NOT NULL"
+			modified_at timestamptz "NOT NULL"
+    }
+
+		trial_group_participants {
+			participant_id text PK "NOT NULL"
+			group_id uuid PK "NOT NULL"
+    }
+
+		trial_groups {
+			id uuid PK "NOT NULL"
+			trial_id uuid "NOT NULL"
+			attribute_values jsonb_array
+    }
+
+		trials {
+			id uuid PK "NOT NULL"
+			scheduled_start timestamptz
+			scheduled_end timestamptz
+			started_at timestamptz
+			ended_at timestamptz
+    }
+
+    offer_validated_history ||--o{ participants : "rafiki_id → id (offer_validated_history_rafiki_id_fkey)"
+    offer_validated_history ||--o{ participants : "tiko_contact_id → id (offer_validated_history_tiko_contact_id_fkey)"
+    participant_groups ||--o{ participants : "participant_id → id (participant_groups_participant_id_fkey)"
+    participant_status ||--o{ participants : "participant_id → id (participant_status_participant_id_fkey)"
+    rafiki_referrals ||--o{ participants : "referral_participant_id → id (lottery_participants_participant_id_fkey)"
+    rafiki_referrals ||--o{ participants : "rafiki_id → id (rafiki_referrals_rafiki_id_fkey)"
+    reward_history ||--o{ participants : "participant_id → id (reward_history_participant_id_fkey)"
+    subscriptions ||--o{ participants : "participant_id → id (subscriptions_participant_id_fkey)"
+    trial_group_participants ||--o{ participants : "participant_id → id (trial_group_participants_participant_id_fkey)"
+    trial_group_participants ||--o{ trial_groups : "group_id → id (trial_group_participants_group_id_fkey)"
+    trial_groups ||--o{ trials : "trial_id → id (trial_groups_trial_id_fkey)"

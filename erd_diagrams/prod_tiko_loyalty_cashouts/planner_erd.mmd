@@ -1,0 +1,23 @@
+%% ER Diagram for planner
+erDiagram
+		cashout_configuration_versions {
+			id integer PK "NOT NULL, DEFAULT nextval('planner.cashout_requests_versions_id_seq'::regclass)"
+			configuration_id uuid "NOT NULL"
+			identifier varchar "NOT NULL"
+			payment_method varchar "NOT NULL"
+			market varchar "NOT NULL"
+			rules jsonb "NOT NULL, DEFAULT '{}'::jsonb"
+			constraints jsonb "NOT NULL"
+			active boolean "NOT NULL"
+			required_approvals varchar_array "NOT NULL"
+			created_by varchar "NOT NULL"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+			triggers_with jsonb
+    }
+
+		cashout_configurations {
+			id uuid PK "NOT NULL, DEFAULT gen_random_uuid()"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+    }
+
+    cashout_configuration_versions ||--o{ cashout_configurations : "configuration_id → id (fk_cashout_request)"

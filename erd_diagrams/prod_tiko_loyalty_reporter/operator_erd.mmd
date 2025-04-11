@@ -1,0 +1,24 @@
+%% ER Diagram for operator
+erDiagram
+		message_configurations {
+			id integer PK "NOT NULL, DEFAULT nextval('operator.message_configurations_id_seq'::regclass)"
+			trigger_type varchar "NOT NULL"
+			trigger_conditions jsonb "NOT NULL, DEFAULT '{}'::jsonb"
+			output_type varchar "NOT NULL"
+			output_parameters jsonb "NOT NULL, DEFAULT '{}'::jsonb"
+			template varchar "NOT NULL"
+			active boolean "NOT NULL"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+			category varchar "NOT NULL"
+    }
+
+		message_variants {
+			id integer PK "NOT NULL, DEFAULT nextval('operator.message_variants_id_seq'::regclass)"
+			configuration integer "NOT NULL"
+			language varchar "NOT NULL"
+			template varchar "NOT NULL"
+			transport varchar
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+    }
+
+    message_variants ||--o{ message_configurations : "configuration → id (message_variants_configuration_fkey)"

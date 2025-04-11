@@ -1,0 +1,69 @@
+%% ER Diagram for feedback
+erDiagram
+		answer_resource {
+			id uuid PK "NOT NULL"
+			questionnaire_answer_id uuid "NOT NULL"
+			locale varchar
+			regex text "NOT NULL"
+    }
+
+		question {
+			id uuid PK "NOT NULL"
+			name text "NOT NULL"
+			question_type question_type "NOT NULL"
+			question_category_id uuid "NOT NULL"
+    }
+
+		question_category {
+			id uuid PK "NOT NULL"
+			name text "NOT NULL"
+    }
+
+		question_resource {
+			id uuid PK "NOT NULL"
+			question_id uuid "NOT NULL"
+			transport transport_type
+			locale varchar
+			text text "NOT NULL"
+    }
+
+		questionnaire {
+			id uuid PK "NOT NULL"
+			name text "NOT NULL"
+			questionnaire_type questionnaire_type "NOT NULL"
+			timeout interval "NOT NULL"
+			first_questionnaire_question_id uuid "UK, NOT NULL"
+    }
+
+		questionnaire_answer {
+			id uuid PK "NOT NULL"
+			questionnaire_question_id uuid "NOT NULL"
+			next_questionnaire_question_id uuid
+    }
+
+		questionnaire_in_progress {
+			idempotency_id text PK "NOT NULL"
+			questionnaire jsonb "NOT NULL"
+    }
+
+		questionnaire_question {
+			id uuid PK "NOT NULL"
+			question_id uuid "NOT NULL"
+    }
+
+		questionnaire_trigger {
+			id uuid PK "NOT NULL"
+			questionnaire_id uuid "UK, NOT NULL"
+			delay delay_domain "NOT NULL"
+			trigger_criteria jsonb
+			countries text_array "NOT NULL"
+    }
+
+    answer_resource ||--o{ questionnaire_answer : "questionnaire_answer_id → id (answer_resource_questionnaire_answer_id_fkey)"
+    question ||--o{ question_category : "question_category_id → id (question_question_category_id_fkey)"
+    question_resource ||--o{ question : "question_id → id (question_resource_question_id_fkey)"
+    questionnaire ||--o{ questionnaire_question : "first_questionnaire_question_id → id (questionnaire_first_questionnaire_question_id_fkey)"
+    questionnaire_answer ||--o{ questionnaire_question : "questionnaire_question_id → id (questionnaire_answer_questionnaire_question_id_fkey)"
+    questionnaire_answer ||--o{ questionnaire_question : "next_questionnaire_question_id → id (questionnaire_answer_next_questionnaire_question_id_fkey)"
+    questionnaire_question ||--o{ question : "question_id → id (questionnaire_question_question_id_fkey)"
+    questionnaire_trigger ||--o{ questionnaire : "questionnaire_id → id (questionnaire_trigger_questionnaire_id_fkey)"

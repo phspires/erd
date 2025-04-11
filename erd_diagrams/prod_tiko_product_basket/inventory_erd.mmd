@@ -1,0 +1,29 @@
+%% ER Diagram for inventory
+erDiagram
+		products {
+			id uuid PK "NOT NULL, DEFAULT gen_random_uuid()"
+			business_id uuid "UK, NOT NULL"
+			name varchar "UK, NOT NULL"
+			created_by varchar
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+    }
+
+		stock_report_requests {
+			id integer PK "NOT NULL, DEFAULT nextval('inventory.stock_report_requests_id_seq'::regclass)"
+			business_id uuid "NOT NULL"
+			stock_from timestamptz "NOT NULL"
+			stock_until timestamptz "NOT NULL"
+			created_by varchar "NOT NULL"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+    }
+
+		stocks {
+			id integer PK "NOT NULL, DEFAULT nextval('inventory.stocks_id_seq'::regclass)"
+			product_id uuid "NOT NULL"
+			notes varchar
+			quantity integer "NOT NULL"
+			created_by varchar
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+    }
+
+    stocks ||--o{ products : "product_id → id (fk_product)"

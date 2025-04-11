@@ -1,0 +1,22 @@
+%% ER Diagram for message_gateway
+erDiagram
+		contact {
+			participant_id uuid
+			contact contact_id PK "NOT NULL"
+			last_incoming_at timestamptz
+			created_at timestamptz "NOT NULL"
+    }
+
+		participants {
+			id uuid PK "NOT NULL"
+			country_code text "NOT NULL"
+			language text
+    }
+
+		sent_messages {
+			idempotency_id text PK "NOT NULL"
+			text text "NOT NULL"
+			participant_id uuid "NOT NULL"
+			contact contact_id "NOT NULL"
+			occurred_at timestamptz "NOT NULL"
+    }

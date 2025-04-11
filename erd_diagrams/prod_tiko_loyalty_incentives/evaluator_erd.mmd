@@ -1,0 +1,55 @@
+%% ER Diagram for evaluator
+erDiagram
+		incentives {
+			id uuid PK "NOT NULL, DEFAULT gen_random_uuid()"
+			target jsonb "NOT NULL"
+			event varchar "NOT NULL"
+			market varchar "NOT NULL"
+			role varchar "NOT NULL"
+			reward bigint "NOT NULL"
+			reward_configuration jsonb "NOT NULL"
+			funding jsonb "NOT NULL"
+			used_configuration uuid "NOT NULL"
+			request_identifier varchar "UK, NOT NULL"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+			trigger jsonb
+    }
+
+		incentives_configuration {
+			id uuid PK "NOT NULL, DEFAULT gen_random_uuid()"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+    }
+
+		incentives_configuration_versions {
+			id integer PK "NOT NULL, DEFAULT nextval('evaluator.incentives_configuration_versions_id_seq'::regclass)"
+			configuration_id uuid "NOT NULL"
+			event varchar "NOT NULL"
+			market varchar "NOT NULL"
+			constraints jsonb "NOT NULL"
+			prospects jsonb "NOT NULL"
+			funding jsonb "NOT NULL"
+			active boolean "NOT NULL"
+			created_by varchar "NOT NULL"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+			identifier varchar "NOT NULL"
+    }
+
+		incentives_states {
+			id integer PK "NOT NULL, DEFAULT nextval('evaluator.incentives_states_id_seq'::regclass)"
+			incentive_id uuid "NOT NULL"
+			state varchar "NOT NULL"
+			context jsonb "NOT NULL"
+			metadata jsonb "NOT NULL, DEFAULT '{}'::jsonb"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+    }
+
+		service_settings {
+			id integer PK "NOT NULL"
+			incentive_settings jsonb "NOT NULL"
+			created_by varchar "NOT NULL"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+			management_settings jsonb "NOT NULL"
+    }
+
+    incentives_configuration_versions ||--o{ incentives_configuration : "configuration_id → id (fk_incentives_configuration_versions)"
+    incentives_states ||--o{ incentives : "incentive_id → id (fk_incentive_states)"

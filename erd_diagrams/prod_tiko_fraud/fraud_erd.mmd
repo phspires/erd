@@ -1,0 +1,370 @@
+%% ER Diagram for fraud
+erDiagram
+		actor_action_debounce {
+			id uuid PK "NOT NULL"
+			type text PK "NOT NULL"
+			action text PK "NOT NULL"
+			occurred_at timestamptz "NOT NULL"
+    }
+
+		business_hours {
+			tiko_contact_business_id text "DEFAULT 1"
+			weekly_business_hours jsonb
+			updated_at timestamptz "NOT NULL"
+    }
+
+		connector {
+			connector_uuid text PK "NOT NULL"
+			name varchar
+			mobile_phone varchar
+			country_code varchar
+			last_updated timestamptz
+			tiko_account_balance text "DEFAULT '0'::text"
+			tsf_attached varchar
+			organisation_id text
+			gender text
+			type text
+			status text
+			birth_date text
+			telegram text
+			facebook text
+			other_mobile_phone text
+			email text
+			correlation_id text
+			stage text
+			tiko_location_uuid text
+    }
+
+		emails_to_notify {
+			id integer PK "NOT NULL, DEFAULT nextval('fraud.emails_to_notify_id_seq'::regclass)"
+			email text "UK, NOT NULL"
+			country_code varchar
+    }
+
+		enrollment {
+			id integer PK "NOT NULL, DEFAULT nextval('fraud.enrollment_id_seq'::regclass)"
+			tiko_contact_id text
+			tiko_contact_business_id text
+			rafiki_id text
+			occurred_at timestamptz "NOT NULL"
+			sim_cell_number text
+			country_code text
+			sim_cell_provider text
+			business_sub_type text
+			is_valid_cell boolean
+			community_based_org_name text
+			enrollment_type text
+			enrollment_tech_pathway text
+			correlation_id text
+			coordinates text
+    }
+
+		entity_notes {
+			entity_id text PK "NOT NULL"
+			notes text "NOT NULL"
+			created_by text
+			last_modified_by text
+			created_on timestamptz
+			last_modified_date timestamptz
+    }
+
+		facial_recognition_matched_face {
+			id integer PK "NOT NULL, DEFAULT nextval('fraud.facial_recognition_matched_face_id_seq'::regclass)"
+			registered_tiko_uuid text "NOT NULL"
+			fraudulent_tiko_uuid text "NOT NULL"
+			correlation_id text
+			registered_tiko_country_code text "NOT NULL"
+			fraudulent_tiko_country_code text "NOT NULL"
+			similarity double precision "NOT NULL"
+			transaction_type text "NOT NULL"
+			occurred_at timestamptz "NOT NULL"
+    }
+
+		facial_recognition_sign_in_attempt_exceeded {
+			id integer PK "NOT NULL, DEFAULT nextval('fraud.facial_recognition_sign_in_attempt_exceeded_id_seq'::regclass)"
+			tiko_uuid text "NOT NULL"
+			correlation_id text
+			country_code text "NOT NULL"
+			transaction_type text "NOT NULL"
+			occurred_at timestamptz "NOT NULL"
+			sign_in_attempts integer "NOT NULL"
+    }
+
+		facility {
+			facility_uuid text PK "NOT NULL"
+			facility_name varchar
+			country_code varchar
+			facility_rating text "DEFAULT '0'::text"
+			facility_capacity varchar
+			facility_organization varchar
+			facility_loa_status varchar
+			type text
+			sub_type text
+			show_location_to_rafiki boolean "DEFAULT false"
+			status text
+			coordinates text
+			opening_hours text
+			phone text
+			email text
+			tiko_connectors text_array
+			correlation_id text
+			last_updated timestamptz
+			owner_uuid text
+			tiko_location_uuid text
+			payment_method text
+    }
+
+		flyway_schema_history {
+			installed_rank integer PK "NOT NULL"
+			version varchar
+			description varchar "NOT NULL"
+			type varchar "NOT NULL"
+			script varchar "NOT NULL"
+			checksum integer
+			installed_by varchar "NOT NULL"
+			installed_on timestamp "NOT NULL, DEFAULT now()"
+			execution_time integer "NOT NULL"
+			success boolean "NOT NULL"
+    }
+
+		fraud_item_rule_result {
+			fraud_rule_result_id integer PK "NOT NULL"
+			fraud_item_id integer PK "NOT NULL"
+    }
+
+		fraud_rule_result {
+			id integer PK "NOT NULL"
+			rule_result varchar "NOT NULL"
+			rule_name varchar "NOT NULL"
+			created_at timestamptz "NOT NULL"
+			processed boolean "NOT NULL"
+			rule_fk integer
+			fraud_context_processed jsonb
+    }
+
+		fraud_type {
+			type_key text PK "NOT NULL"
+			type_description text "NOT NULL"
+			rule_name text
+    }
+
+		fraudulent_business_sub_type {
+			business_sub_type text PK "NOT NULL"
+			fraud_interval_duration_type text "NOT NULL"
+			fraud_interval_duration_value integer "NOT NULL"
+    }
+
+		fraudulent_entities_status {
+			id integer PK "NOT NULL, DEFAULT nextval('fraud.fraudulent_entities_status_id_seq'::regclass)"
+			status text "NOT NULL"
+			description text "NOT NULL"
+    }
+
+		fraudulent_flagged_entities {
+			id bigint PK "NOT NULL, DEFAULT nextval('fraud.fraudulent_flagged_entities_id_sq'::regclass)"
+			connector_id varchar
+			facility_id varchar
+			rafiki_id varchar
+			created_date timestamptz "NOT NULL"
+			status bigint
+			assignee text
+    }
+
+		fraudulent_item {
+			fraud_item_id integer PK "NOT NULL"
+			enrollment_id integer
+			offer_validation_id integer
+			type_key_fk text "NOT NULL"
+			email_reported boolean "DEFAULT false"
+			slack_reported boolean "DEFAULT false"
+			risk_type varchar
+			asana_ticket_link text
+    }
+
+		location {
+			id uuid PK "NOT NULL"
+			name text "NOT NULL"
+			country_code text "NOT NULL"
+    }
+
+		location_country {
+			code text PK "NOT NULL"
+			updated_at timestamptz "NOT NULL"
+    }
+
+		notification_configuration {
+			id integer PK "NOT NULL, DEFAULT nextval('fraud.notification_configuration_id_seq'::regclass)"
+			rule_id bigint "NOT NULL"
+			country varchar "NOT NULL"
+			notification_time time "DEFAULT '00:00:00'::time without time zone"
+			created_at timestamptz "NOT NULL, DEFAULT timezone('utc'::text, now())"
+			notification_channel varchar "DEFAULT 'SLACK'::character varying"
+    }
+
+		offer_validation {
+			correlation_id text "NOT NULL"
+			validation_id text "NOT NULL"
+			tiko_contact_id text
+			tiko_contact_business_id text
+			rafiki_id text
+			country_code text "NOT NULL"
+			occurred_at timestamptz
+			offer_id text
+			business_sub_type text
+			offer_validation_id integer PK "NOT NULL, DEFAULT nextval('fraud.offer_validation_offer_validation_id_seq'::regclass)"
+			procedure varchar
+			coordinates text
+    }
+
+		report {
+			id text PK "NOT NULL"
+			facility_name text
+			facility_sub_type text
+			facility_owner text
+			country_code text
+			report_date timestamptz
+			upload_date timestamptz
+			assignee text
+			report_type text
+			status text
+			report_fields text
+			last_modified_date timestamptz
+			created_by text
+			facility_uuid text
+			correlation_id text
+    }
+
+		report_template {
+			id text PK "NOT NULL"
+			type text "UK, NOT NULL"
+			fields jsonb "NOT NULL"
+			country_code text "NOT NULL"
+			facility_sub_types text_array "NOT NULL"
+			enabled boolean "NOT NULL, DEFAULT true"
+			created_at timestamptz
+			updated_at timestamptz
+			correlation_id text
+    }
+
+		rule_exceptions_gps {
+			id uuid PK "NOT NULL"
+			rule_id integer "NOT NULL"
+			facility_id text "UK, NOT NULL"
+			uncertainty integer "NOT NULL"
+			reason text
+			created_at timestamptz "NOT NULL"
+			updated_at timestamptz "NOT NULL"
+			location_id uuid "NOT NULL"
+    }
+
+		rules {
+			id integer PK "NOT NULL, DEFAULT nextval('fraud.rules_id_seq'::regclass)"
+			period text
+			properties jsonb
+			fraud_type_fk text "NOT NULL"
+			start_time time "DEFAULT '00:00:00'::time without time zone"
+			rule_status text "DEFAULT 'ACTIVATED'::text"
+			dtype text "NOT NULL, DEFAULT 'RuleJpa'::text"
+    }
+
+		sent_notifications {
+			id integer PK "NOT NULL, DEFAULT nextval('fraud.sent_notifications_id_seq'::regclass)"
+			fraud_rule_result_id bigint "NOT NULL"
+			slack_sent boolean "DEFAULT false"
+			email_sent boolean "DEFAULT false"
+			asana_sent boolean "DEFAULT false"
+			country varchar "NOT NULL"
+			created_at timestamptz "NOT NULL, DEFAULT timezone('utc'::text, now())"
+    }
+
+		service_validation {
+			id uuid PK "NOT NULL"
+			business_id uuid
+			connector_id uuid "NOT NULL"
+			service_id uuid "NOT NULL"
+			service_identifier text "NOT NULL"
+			coordinates text
+			correlation_id text "NOT NULL"
+			occurred_at timestamptz
+			gps_rule_error boolean "NOT NULL, DEFAULT false"
+			country_code text
+			gps_rule_evaluated boolean "NOT NULL, DEFAULT false"
+			verified boolean "NOT NULL, DEFAULT true"
+			client_id uuid "NOT NULL"
+			intervention_id uuid "NOT NULL"
+			intervention_identifier text "NOT NULL"
+			eligible_project_ids uuid_array "NOT NULL"
+			positive_health_impact boolean
+			voice_session_id uuid
+			cyp_quantity integer
+			cyp_quantity_validation integer
+			cyp_factor double precision
+    }
+
+		service_validation_fraud_item {
+			id uuid PK "NOT NULL"
+			business_id uuid
+			connector_id uuid "NOT NULL"
+			service_id uuid "NOT NULL"
+			service_identifier text "NOT NULL"
+			occurred_at timestamptz "NOT NULL"
+			country_code text "NOT NULL"
+    }
+
+		service_validation_verification {
+			id uuid PK "NOT NULL"
+			action text "NOT NULL"
+			performed_at timestamptz "NOT NULL"
+			performed_by text "NOT NULL"
+			reason text
+    }
+
+		service_validation_verification_aud {
+			id uuid PK "NOT NULL"
+			rev integer PK "NOT NULL"
+			revtype smallint
+			revend integer
+			action text
+			performed_at timestamp
+			performed_by text
+			reason text
+    }
+
+		shedlock {
+			name varchar PK "NOT NULL"
+			lock_until timestamp "NOT NULL"
+			locked_at timestamp "NOT NULL"
+			locked_by varchar "NOT NULL"
+    }
+
+		sqs_consumed_messages {
+			id bigint PK "NOT NULL"
+			message_id varchar "UK, NOT NULL"
+			consumed_at timestamptz "NOT NULL"
+    }
+
+		voice_biometric_entry {
+			id integer PK "NOT NULL, DEFAULT nextval('fraud.voice_biometric_entry_id_seq'::regclass)"
+			rafiki_id text "NOT NULL"
+			correlation_id text
+			country_code text
+			occurred_at timestamptz "NOT NULL"
+			consecutive_failed_attempts integer
+    }
+
+    fraud_item_rule_result ||--o{ fraud_rule_result : "fraud_rule_result_id → id (fraud_rule_result_fk)"
+    fraud_item_rule_result ||--o{ fraudulent_item : "fraud_item_id → fraud_item_id (fraudulent_item_fk)"
+    fraud_rule_result ||--o{ rules : "rule_fk → id (fk_fraud_type)"
+    fraudulent_flagged_entities ||--o{ fraudulent_entities_status : "status → id (fk_flagged_status)"
+    fraudulent_item ||--o{ enrollment : "enrollment_id → id (fraudulent_item_enrollment_id_fkey)"
+    fraudulent_item ||--o{ fraud_type : "type_key_fk → type_key (fk_fraud_type)"
+    fraudulent_item ||--o{ offer_validation : "offer_validation_id → offer_validation_id (fraudulent_item_offer_validation_id_fkey)"
+    location ||--o{ location_country : "country_code → code (location_country_code_fkey)"
+    rule_exceptions_gps ||--o{ facility : "facility_id → facility_uuid (rule_exceptions_gps_facility_id_fkey)"
+    rule_exceptions_gps ||--o{ location : "location_id → id (rule_exceptions_gps_location_id_fkey)"
+    rule_exceptions_gps ||--o{ rules : "rule_id → id (rule_exceptions_gps_rule_id_fkey)"
+    rules ||--o{ fraud_type : "fraud_type_fk → type_key (fk_fraud_type)"
+    sent_notifications ||--o{ fraud_rule_result : "fraud_rule_result_id → id (rule_result_fk)"
+    service_validation_verification ||--o{ service_validation : "id → id (service_validation_verification_id_fkey)"
+    service_validation_verification_aud }o--|| revinfo : "Cross-schema: → revinfo(rev)"
+    service_validation_verification_aud }o--|| revinfo : "Cross-schema: → revinfo(rev)"

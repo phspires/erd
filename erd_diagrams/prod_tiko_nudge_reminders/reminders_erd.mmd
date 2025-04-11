@@ -1,0 +1,48 @@
+%% ER Diagram for reminders
+erDiagram
+		reminders {
+			id uuid PK "NOT NULL"
+			delay delay_domain "NOT NULL"
+			recurrence integer "NOT NULL"
+			trigger jsonb "NOT NULL"
+			cancellable_by jsonb "NOT NULL"
+			country_codes text_array "NOT NULL"
+			message_content jsonb "NOT NULL"
+			is_active boolean "NOT NULL, DEFAULT true"
+			modified_at timestamptz "NOT NULL"
+    }
+
+		scheduled_reminders {
+			id uuid PK "NOT NULL"
+			reminder_id uuid "UK, NOT NULL"
+			scheduled_for timestamptz "UK, NOT NULL"
+    }
+
+		scheduled_reminders_tiko_actors {
+			scheduled_reminder_id uuid PK "NOT NULL"
+			tiko_actor_id uuid PK "NOT NULL"
+			event_occurred_at timestamptz "NOT NULL"
+    }
+
+		service_validated_history {
+			idempotency_id text PK "NOT NULL"
+			client_id uuid "NOT NULL"
+			service_id uuid "NOT NULL"
+			occurred_at timestamptz "NOT NULL"
+			offer_validated_idempotency_id text "UK"
+    }
+
+		tiko_actors {
+			id uuid PK "NOT NULL"
+			country_code text "NOT NULL"
+			role tiko_actor_role "NOT NULL"
+			status tiko_actor_status "NOT NULL"
+			birth_date date
+			gender gender
+			modified_at timestamptz "NOT NULL"
+    }
+
+    scheduled_reminders ||--o{ reminders : "reminder_id → id (scheduled_reminders_reminder_id_fkey)"
+    scheduled_reminders_tiko_actors ||--o{ scheduled_reminders : "scheduled_reminder_id → id (scheduled_reminders_tiko_actors_scheduled_reminder_id_fkey)"
+    scheduled_reminders_tiko_actors ||--o{ tiko_actors : "tiko_actor_id → id (scheduled_reminders_tiko_actors_tiko_actor_id_fkey)"
+    service_validated_history ||--o{ tiko_actors : "client_id → id (service_validated_history_client_id_fkey)"

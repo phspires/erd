@@ -1,0 +1,46 @@
+%% ER Diagram for warden
+erDiagram
+		fund_accounts {
+			id uuid PK "NOT NULL"
+			fund_id uuid "UK, NOT NULL"
+			kind varchar "UK, NOT NULL"
+			balance bigint "NOT NULL"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+			modified_at timestamptz "NOT NULL, DEFAULT now()"
+			data_timestamp timestamptz "NOT NULL"
+    }
+
+		funds {
+			id uuid PK "NOT NULL, DEFAULT gen_random_uuid()"
+			project_id uuid "UK, NOT NULL"
+			intervention_id uuid "UK"
+			state varchar "NOT NULL"
+			market varchar "NOT NULL"
+			allocation_amount bigint "NOT NULL"
+			release_strategy jsonb "NOT NULL"
+			metadata jsonb "NOT NULL, DEFAULT '{}'::jsonb"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+			modified_at timestamptz "NOT NULL, DEFAULT now()"
+			alert_triggers jsonb "NOT NULL, DEFAULT '[]'::jsonb"
+    }
+
+		operation_states {
+			id integer PK "NOT NULL"
+			operation_id integer "NOT NULL"
+			state varchar "NOT NULL"
+			context jsonb "NOT NULL"
+			metadata jsonb "NOT NULL, DEFAULT '{}'::jsonb"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+    }
+
+		operations {
+			id integer PK "NOT NULL"
+			fund_id uuid "NOT NULL"
+			task varchar "NOT NULL"
+			request varchar "UK, NOT NULL"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+    }
+
+    fund_accounts ||--o{ funds : "fund_id → id (fk_fund_accounts)"
+    operation_states ||--o{ operations : "operation_id → id (fk_operation_states)"
+    operations ||--o{ funds : "fund_id → id (fk_operations)"

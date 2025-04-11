@@ -1,0 +1,59 @@
+%% ER Diagram for lottery
+erDiagram
+		lotteries {
+			id uuid PK "NOT NULL"
+			name text "NOT NULL"
+			schedule lottery_schedule_domain
+			country_code varchar "NOT NULL"
+    }
+
+		lottery_participants {
+			lottery_id uuid PK "NOT NULL"
+			participant_id uuid PK "NOT NULL"
+			participant_status lottery_participant_status "NOT NULL"
+    }
+
+		lottery_recurring_steps {
+			id uuid PK "NOT NULL"
+			lottery_id uuid "UK, NOT NULL"
+			step_trigger lottery_recurring_step_trigger "UK, NOT NULL"
+			new_participant_status lottery_participant_status "NOT NULL"
+			selector jsonb "NOT NULL"
+    }
+
+		lottery_scheduled_steps {
+			id uuid PK "NOT NULL"
+			lottery_id uuid "UK, NOT NULL"
+			processed_at timestamptz
+			step_trigger lottery_scheduled_step_trigger "UK, NOT NULL"
+			new_participant_status lottery_participant_status "NOT NULL"
+			selector jsonb "NOT NULL"
+    }
+
+		offer_validated_history {
+			offer_validated_event_idempotency_id text PK "NOT NULL"
+			rafiki_id uuid "NOT NULL"
+			offer_id text "NOT NULL"
+			tiko_contact_id uuid
+			occurred_at timestamptz "NOT NULL"
+    }
+
+		participants {
+			id uuid PK "NOT NULL"
+			country_code text "NOT NULL"
+			year_of_birth integer
+			month_of_birth integer
+			gender gender
+			organisation_id text
+			location text_array
+			modified_at timestamptz "NOT NULL"
+			role participant_role
+			eligibility participant_eligibility "NOT NULL"
+    }
+
+    lottery_participants ||--o{ lotteries : "lottery_id → id (lottery_participants_lottery_id_fkey)"
+    lottery_participants ||--o{ participants : "participant_id → id (lottery_participants_participant_id_fkey)"
+    lottery_recurring_steps ||--o{ lotteries : "lottery_id → id (lottery_recurring_steps_lottery_id_fkey)"
+    lottery_scheduled_steps ||--o{ lotteries : "lottery_id → id (lottery_scheduled_steps_lottery_id_fkey)"
+    offer_validated_history ||--o{ participants : "rafiki_id → id (offer_validated_history_rafiki_id_fkey)"
+    offer_validated_history ||--o{ participants : "tiko_contact_id → id (offer_validated_history_tiko_contact_id_fkey)"

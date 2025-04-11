@@ -1,0 +1,233 @@
+%% ER Diagram for servicevalidation
+erDiagram
+		business_hours_restrictions {
+			location_id uuid PK "NOT NULL"
+			target_sectors facility_sector_array "NOT NULL"
+    }
+
+		client_answered_questions {
+			question_id uuid PK "NOT NULL"
+			service_validated_history_id service_validated_history_id PK "NOT NULL"
+    }
+
+		clients {
+			id uuid PK "NOT NULL"
+			birth_date date
+			gender gender
+			role role "NOT NULL"
+			country_code text "NOT NULL"
+			modified_at timestamptz "NOT NULL"
+			client_status client_status "NOT NULL"
+    }
+
+		exclusion_groups {
+			id uuid PK "NOT NULL"
+			identifier text "UK, NOT NULL"
+			description text
+    }
+
+		facilities {
+			id uuid PK "NOT NULL"
+			facility_type facility_type "NOT NULL"
+			facility_subtype facility_subtype "NOT NULL"
+			location_id uuid "NOT NULL"
+			modified_at timestamptz "NOT NULL"
+			sector facility_sector "NOT NULL"
+			time_zone text "NOT NULL"
+			hours jsonb
+    }
+
+		facility_interventions {
+			facility_id uuid PK "NOT NULL"
+			intervention_id uuid PK "NOT NULL"
+    }
+
+		interventions {
+			id uuid PK "NOT NULL"
+			identifier text "UK, NOT NULL"
+			description text
+    }
+
+		locations_structure {
+			id uuid PK "NOT NULL"
+			path ltree "NOT NULL"
+    }
+
+		offers {
+			id uuid PK "NOT NULL"
+			modified_at timestamptz "NOT NULL"
+			identifier text "UK, NOT NULL"
+			project_id uuid "NOT NULL"
+			intervention_id uuid "NOT NULL"
+			role role "NOT NULL"
+			age_range age_range "NOT NULL"
+			locations uuid_array "NOT NULL"
+			facility_subtype facility_subtype
+			genders gender_array "NOT NULL"
+			permitted_provider_designations designation_array
+			targeted_facility_sectors facility_sector_array
+    }
+
+		offers_services {
+			offer_id uuid PK "NOT NULL"
+			service_id uuid PK "NOT NULL"
+    }
+
+		projects {
+			id uuid PK "NOT NULL"
+			state project_state "NOT NULL"
+			modified_at timestamptz "NOT NULL"
+    }
+
+		provider_based_restrictions {
+			location_id uuid PK "NOT NULL"
+			time_restriction interval "NOT NULL"
+    }
+
+		providers {
+			id uuid PK "NOT NULL"
+			designation designation
+			status provider_status "NOT NULL"
+			modified_at timestamptz "NOT NULL"
+    }
+
+		question_countries {
+			question_id uuid PK "NOT NULL"
+			country_code text PK "NOT NULL"
+    }
+
+		question_services {
+			question_id uuid PK "NOT NULL"
+			service_id uuid PK "UK, NOT NULL"
+			question_order integer "UK"
+    }
+
+		questionnaires_in_progress {
+			questions jsonb "NOT NULL"
+			service_validated_history_id service_validated_history_id PK "NOT NULL"
+    }
+
+		questions {
+			id uuid PK "NOT NULL"
+			frequency frequency_type "NOT NULL"
+			required boolean "NOT NULL"
+			config jsonb "NOT NULL"
+			created_at timestamptz "NOT NULL"
+    }
+
+		screening_score_history {
+			service_validated_history_id service_validated_history_id PK "NOT NULL"
+			score integer "NOT NULL"
+    }
+
+		screenings_in_progress {
+			service_id uuid PK "NOT NULL"
+			client_id uuid PK "NOT NULL"
+			questionnaire jsonb "NOT NULL"
+    }
+
+		service_compliance_facility_designations {
+			service_compliance_restriction_id uuid "UK, NOT NULL"
+			facility_subtype facility_subtype "UK"
+			designation designation "UK"
+    }
+
+		service_compliance_restrictions {
+			id uuid PK "NOT NULL"
+			service_id uuid "NOT NULL"
+			location_id uuid "NOT NULL"
+			amount integer "NOT NULL"
+			unit interval "NOT NULL"
+			restriction_type service_compliance_restriction_type "NOT NULL"
+    }
+
+		service_flow_arrows {
+			id uuid PK "NOT NULL"
+			service_flow_id uuid "NOT NULL"
+			source_node_id uuid "UK"
+			target_node_id uuid "UK"
+			arrow_type arrow_type "NOT NULL"
+			config jsonb
+    }
+
+		service_flow_nodes {
+			id uuid PK "NOT NULL"
+			service_flow_id uuid "NOT NULL"
+			service_id uuid "NOT NULL"
+    }
+
+		service_flow_states {
+			exclusion_group_id uuid PK "NOT NULL"
+			client_id uuid PK "NOT NULL"
+			service_flow_node_id uuid "NOT NULL"
+			last_service_validated_id service_validated_history_id "NOT NULL"
+    }
+
+		service_flows {
+			id uuid PK "NOT NULL"
+			identifier text "UK, NOT NULL"
+			description text
+			intervention_id uuid "NOT NULL"
+			exclusion_group_id uuid "NOT NULL"
+			modified_at timestamptz "NOT NULL"
+    }
+
+		service_validated_history {
+			service_id uuid "NOT NULL"
+			client_id uuid "NOT NULL"
+			facility_id uuid
+			occurred_at timestamptz "NOT NULL"
+			offer_validated_idempotency_id text "UK"
+			id service_validated_history_id PK "NOT NULL"
+			provider_id uuid "NOT NULL"
+    }
+
+		services {
+			id uuid PK "NOT NULL"
+			identifier text "UK, NOT NULL"
+			description text
+			intervention_id uuid "NOT NULL"
+			modified_at timestamptz "NOT NULL"
+			validation_type validation_type "NOT NULL"
+			positivehealthimpact boolean "DEFAULT true"
+			metadata jsonb
+			type jsonb "NOT NULL"
+			voice_authentication_required boolean "NOT NULL"
+			permitted_provider_designations designation_array
+    }
+
+    business_hours_restrictions ||--o{ locations_structure : "location_id → id (business_hours_restrictions_location_id_fkey)"
+    client_answered_questions ||--o{ questions : "question_id → id (client_answered_questions_question_id_fkey)"
+    client_answered_questions ||--o{ service_validated_history : "service_validated_history_id → id (client_answered_questions_service_validated_history_id_fkey)"
+    facilities ||--o{ locations_structure : "location_id → id (facilities_location_id_fkey)"
+    facility_interventions ||--o{ facilities : "facility_id → id (facility_interventions_facility_id_fkey)"
+    facility_interventions ||--o{ interventions : "intervention_id → id (facility_interventions_intervention_id_fkey)"
+    offers ||--o{ interventions : "intervention_id → id (offers_intervention_id_fkey)"
+    offers ||--o{ projects : "project_id → id (offers_project_id_fkey)"
+    offers_services ||--o{ offers : "offer_id → id (offers_services_offer_id_fkey)"
+    offers_services ||--o{ services : "service_id → id (offers_services_service_id_fkey)"
+    provider_based_restrictions ||--o{ locations_structure : "location_id → id (provider_based_restrictions_location_id_fkey)"
+    question_countries ||--o{ questions : "question_id → id (question_countries_question_id_fkey)"
+    question_services ||--o{ questions : "question_id → id (question_services_question_id_fkey)"
+    question_services ||--o{ services : "service_id → id (question_services_service_id_fkey)"
+    screening_score_history ||--o{ service_validated_history : "service_validated_history_id → id (screening_score_history_service_validated_history_id_fkey)"
+    screenings_in_progress ||--o{ clients : "client_id → id (screenings_in_progress_client_id_fkey)"
+    screenings_in_progress ||--o{ services : "service_id → id (screenings_in_progress_service_id_fkey)"
+    service_compliance_facility_designations ||--o{ service_compliance_restrictions : "service_compliance_restriction_id → id (service_compliance_facility_d_service_compliance_restricti_fkey)"
+    service_compliance_restrictions ||--o{ locations_structure : "location_id → id (service_compliance_restrictions_location_id_fkey)"
+    service_compliance_restrictions ||--o{ services : "service_id → id (service_compliance_restrictions_service_id_fkey)"
+    service_flow_arrows ||--o{ service_flow_nodes : "source_node_id → id (service_flow_arrows_source_node_id_fkey)"
+    service_flow_arrows ||--o{ service_flow_nodes : "target_node_id → id (service_flow_arrows_target_node_id_fkey)"
+    service_flow_arrows ||--o{ service_flows : "service_flow_id → id (service_flow_arrows_service_flow_id_fkey)"
+    service_flow_nodes ||--o{ service_flows : "service_flow_id → id (service_flow_nodes_service_flow_id_fkey)"
+    service_flow_nodes ||--o{ services : "service_id → id (service_flow_nodes_service_id_fkey)"
+    service_flow_states ||--o{ clients : "client_id → id (service_flow_states_client_id_fkey)"
+    service_flow_states ||--o{ exclusion_groups : "exclusion_group_id → id (service_flow_states_exclusion_group_id_fkey)"
+    service_flow_states ||--o{ service_flow_nodes : "service_flow_node_id → id (service_flow_states_service_flow_node_id_fkey)"
+    service_flow_states ||--o{ service_validated_history : "last_service_validated_id → id (service_flow_states_last_service_validated_id_fkey)"
+    service_flows ||--o{ exclusion_groups : "exclusion_group_id → id (service_flows_exclusion_group_id_fkey)"
+    service_flows ||--o{ interventions : "intervention_id → id (service_flows_intervention_id_fkey)"
+    service_validated_history ||--o{ clients : "client_id → id (service_validated_history_client_id_fkey)"
+    service_validated_history ||--o{ facilities : "facility_id → id (service_validated_history_facility_id_fkey)"
+    service_validated_history ||--o{ services : "service_id → id (service_validated_history_service_id_fkey)"
+    services ||--o{ interventions : "intervention_id → id (services_intervention_id_fkey)"

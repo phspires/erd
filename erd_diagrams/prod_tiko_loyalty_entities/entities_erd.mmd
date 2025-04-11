@@ -1,0 +1,21 @@
+%% ER Diagram for entities
+erDiagram
+		entity_store {
+			id uuid PK "NOT NULL"
+			kind varchar "NOT NULL"
+			country varchar "NOT NULL"
+			metadata jsonb "NOT NULL, DEFAULT '{}'::jsonb"
+			modified_at timestamptz "NOT NULL, DEFAULT now()"
+			data_timestamp timestamptz "NOT NULL"
+			location_id uuid
+			market varchar
+			state varchar "NOT NULL"
+    }
+
+		locations {
+			id uuid PK "NOT NULL"
+			country varchar "NOT NULL"
+			path ltree "NOT NULL"
+			modified_at timestamptz "NOT NULL, DEFAULT now()"
+			data_timestamp timestamptz "NOT NULL"
+    }

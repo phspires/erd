@@ -1,0 +1,6 @@
+%% ER Diagram for template_service
+erDiagram
+		templates {
+			id integer PK "NOT NULL, DEFAULT nextval('template_service.templates_id_seq'::regclass)"
+			identifier text "UK, NOT NULL"
+    }

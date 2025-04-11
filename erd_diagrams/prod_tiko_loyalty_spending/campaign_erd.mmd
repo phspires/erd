@@ -1,0 +1,34 @@
+%% ER Diagram for campaign
+erDiagram
+		incoming_message_configurations {
+			id integer PK "NOT NULL, DEFAULT nextval('campaign.incoming_message_configurations_id_seq'::regclass)"
+			keyword varchar "UK, NOT NULL"
+			message_type varchar "NOT NULL"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+    }
+
+		redemption_states {
+			id integer PK "NOT NULL, DEFAULT nextval('campaign.redemption_states_id_seq'::regclass)"
+			redemption_id uuid "NOT NULL"
+			state varchar "NOT NULL"
+			metadata jsonb "NOT NULL, DEFAULT '{}'::jsonb"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+    }
+
+		redemptions {
+			id uuid PK "NOT NULL, DEFAULT gen_random_uuid()"
+			spender_id uuid "NOT NULL"
+			spender_kind varchar "NOT NULL"
+			spender_channel varchar "NOT NULL"
+			mediator_id uuid "NOT NULL"
+			mediator_kind varchar "NOT NULL"
+			mediator_channel varchar "NOT NULL"
+			recipient_id uuid "NOT NULL"
+			recipient_kind varchar "NOT NULL"
+			request varchar "UK, NOT NULL"
+			amount bigint "NOT NULL"
+			country varchar "NOT NULL"
+			created_at timestamptz "NOT NULL, DEFAULT now()"
+    }
+
+    redemption_states ||--o{ redemptions : "redemption_id → id (fk_redemption_states)"

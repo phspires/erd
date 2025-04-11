@@ -1,0 +1,11 @@
+%% ER Diagram for relay
+erDiagram
+		request_configurations {
+			id integer PK "NOT NULL"
+			keyword varchar "NOT NULL"
+			request_type varchar "NOT NULL"
+			markets varchar_array
+			active boolean "NOT NULL"
+			modified_by varchar "NOT NULL"
+			modified_at timestamptz "NOT NULL, DEFAULT now()"
+    }
