@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
+from datetime import datetime
 from pathlib import Path
+import pathlib
 import psycopg2
 from psycopg2 import sql
 import os
@@ -26,7 +28,8 @@ class ERDGenerator:
             'timestamp without time zone': 'timestamp',
             'character varying': 'varchar',
             'time with time zone': 'timetz',
-            'time without time zone': 'time'
+            'time without time zone': 'time',
+            'double precision': 'double'
         }
 
         script_dir = Path(__file__).parent.resolve()  # Directory of the script
@@ -274,6 +277,33 @@ class ERDGenerator:
         for dbname in databases:
             db_path = output_dir / dbname
             self._process_database(dbname, db_path)
+
+    def create_markdown_wrapper(mmd_file_path, embed=False):
+        """Create .md file that references or embeds .mmd content"""
+        mmd_path = pathlib.Path(mmd_file_path)
+        md_path = mmd_path.with_suffix('.md')
+
+        with open(mmd_path, 'r') as f:
+            mmd_content = f.read().strip()
+
+        if embed:
+            diagram_block = f"```mermaid\n{mmd_content}\n```"
+        else:
+            diagram_block = f"```mermaid\n%% Source: {mmd_path.name}\ninclude::{mmd_path.relative_to(md_path.parent)}\n```"
+
+        md_content = f"""# {mmd_path.stem.replace('_', ' ').title()}
+
+        {diagram_block}
+
+        *Diagram generated from [{mmd_path.name}]({mmd_path.name}) on {datetime.now().strftime('%Y-%m-%d %H:%M')}*
+
+        ## Documentation
+
+        Add your entity and relationship descriptions here.
+        """
+
+        with open(md_path, 'w') as f:
+            f.write(md_content)
 
 if __name__ == '__main__':
     
